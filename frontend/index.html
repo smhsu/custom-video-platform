@@ -1,14 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>PolyVideo</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="index.css" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap"
+      rel="stylesheet"
+    />
   </head>
+
   <body>
     <script src="index.js"></script>
+    <div class="desktop-app App">
+      <header class="Navbar">
+        <h1 class="Navbar-logo">PolyVideo</h1>
+        <div class="Navbar-container-right">
+          <a href="login.html">Login</a>
+          <a href="signup.html">Sign Up</a>
+        </div>
+      </header>
+      <div class="Content-container">
+        <div class="PostVideo">
+          <div class="PostVideo-video-wrapper">
+            <span title="Play Video" class="video-play-pointer"></span>
+            <video controls width="720">
+              <source
+                src="media/Random Short Video (F4).mp4"
+                type="video/mp4"
+              />
+            </video>
+            <!-- container for custom controlls, will use default for now -->
+            <div class="PostVideo-controlbar"></div>
+          </div>
+        </div>
+        <div class="EngagementBar">
+          <div class="EngagementBar-left">
+            <img />
+            <div class="video-author-data">
+              <h2 class="video-author">IGN</h2>
+              <h3 class="video-author-subscribers">560K</h3>
+            </div>
+          </div>
+          <div class="EngagementBar-right">
+            <!-- inline svgs worth it to change color when liked/disliked? -->
+            <button class="like-btn" aria-label="Like">
+              <img src="./media/like.svg" />
+            </button>
+            <button class="dislike-btn" aria-label="Dislike">
+              <img src="./media/dislike.svg" />
+            </button>
+          </div>
+        </div>
+        <div class="Comments">
+          <hr class="Comments-seperator" />
+          <div class="Comments-create">
+            <h2 class="Comment-create-header">4 Comments</h2>
+            <form class="Comment-create-input">
+              <img />
+              <input class="create-input-textbox" type="text" />
+              <button class="create-input-submit">POST</button>
+            </form>
+          </div>
+          <div class="Comments-list">
+            <!-- will have multiple comments-items once configured-->
+            <div class="Comments-item">
+              <div class="Comments-item-header">
+                <h3 class="author-name"></h3>
+                <!-- <hr /> for circle dot seperating author and date where width = 0  -->
+                <hr />
+                <p class="comment-date"></p>
+              </div>
+              <div class="Comments-item-content">
+                <div class="item-body">
+                  This is filler text for a fake comment
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
-

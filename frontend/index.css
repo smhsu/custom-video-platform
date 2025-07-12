@@ -1,0 +1,77 @@
+/* * {
+    padding: 0;
+    margin: 0;
+} */
+/* right side of margin needs to be fixed */
+
+body {
+  font-family: "Roboto", "Arial", "Helvetica Neue", sans-serif;
+}
+
+
+.Navbar {
+    padding: 13px 15px;
+    position: sticky;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    top: -1px;
+    background: white;
+}
+
+.Navbar-container-right{
+    display: flex;
+    flex-direction: row;
+    
+    justify-content: space-between;
+}
+
+.Navbar-container-right > a {
+    background-color: black;
+}
+
+.Content-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.EngagementBar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: auto;
+}
+
+.EngagementBar-right button {
+    background: none;
+    padding: 1rem;
+    border-radius: 35%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.EngagementBar-right button:hover,
+.EngagementBar-right button:focus {
+    background: #f0f0f0;
+    box-shadow: 0 0 0 2px #ff0000;
+    outline: none;
+}
+
+.EngagementBar-right button img,
+.EngagementBar-right button svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+    /* prevents the svg from capturing mouse events */
+    pointer-events: none;
+}
+
+.EngagementBar-right button {
+    width: 40px;
+    height: 40px;
+}
+
+
+
