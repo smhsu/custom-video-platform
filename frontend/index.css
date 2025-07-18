@@ -10,19 +10,18 @@ body {
 
 
 .Navbar {
-    padding: 13px 15px;
+    padding: 1rem 1.2rem;
     position: sticky;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    top: -1px;
+    top: -0.0625rem;
     background: white;
 }
 
 .Navbar-container-right{
     display: flex;
     flex-direction: row;
-    
     justify-content: space-between;
 }
 
@@ -30,10 +29,10 @@ body {
     background-color: black;
 }
 
-.Content-container {
+/* .Content-container {
     display: flex;
     flex-direction: column;
-}
+} */
 
 .EngagementBar {
     display: flex;

@@ -1,0 +1,74 @@
+---
+import Layout from "../layouts/Layout.astro";
+import "../styles/global.css";
+---
+
+<!-- Head and body is located in astro layout -->
+<Layout>
+  <div>
+    <header
+      class="sticky top-[-0.0625rem] flex flex-row justify-between p-4 px-5 bg-white"
+    >
+      <h1 id="Navbar-logo">PolyVideo</h1>
+      <div class="flex flex-row justify-between">
+        <a class="bg-black text-white px-3 py-1 rounded" href="login.html"
+          >Login</a
+        >
+        <a class="bg-black text-white px-3 py-1 rounded" href="signup.html"
+          >Sign Up</a
+        >
+      </div>
+    </header>
+    <div id="Content-container">
+      <div>
+        <div>
+          <span title="Play Video" id="video-play-pointer"></span>
+          <video controls width="720">
+            <source src="../../randomvid.mp4" type="video/mp4" />
+          </video>
+          <!-- container for custom controlls, will use default for now -->
+          <div id="PostVideo-controlbar"></div>
+        </div>
+      </div>
+      <div class="flex flex-row justify-between w-auto" id="EngagementBar">
+        <div id="EngagementBar-left">
+          <img />
+          <div id="video-author-data">
+            <h2 id="video-author">IGN</h2>
+            <h3 id="video-author-subscribers">560K Subscribers</h3>
+          </div>
+        </div>
+        <div id="EngagementBar-right">
+          <h2>1.7M Views</h2>
+        </div>
+      </div>
+      <div id="Comments">
+        <hr id="Comments-seperator" />
+        <div id="Comments-create">
+          <h2 id="Comment-create-header">4 Comments</h2>
+          <div class="bg-gray-400 rounded-sm">
+            <h3>
+              You must be <a class="text-blue-600 underline" href="login.html"
+                >logged in</a
+              > to leave a comment
+            </h3>
+          </div>
+        </div>
+        <div id="Comments-list">
+          <!-- will have multiple comments-items once configured-->
+          <div id="Comments-item">
+            <div id="Comments-item-header">
+              <h3 id="author-name"></h3>
+              <!-- <hr /> for circle dot seperating author and date where width ~ 2rem  -->
+              <hr />
+              <p id="comment-date"></p>
+            </div>
+            <div id="Comments-item-content">
+              <div id="item-body">This is filler text for a fake comment</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
