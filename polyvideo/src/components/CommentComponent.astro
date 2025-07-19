@@ -1,0 +1,20 @@
+---
+import CommentList from "./CommentList.astro";
+// prop drilled into CommentList
+const { commentData } = Astro.props;
+---
+
+<div class="mt-6 mb-8">
+  <div>
+    <hr class="mt-4 mb-2" />
+    <h2 class="text-xl font-bold">3 Comments</h2>
+    <div class="bg-gray-300 rounded-sm p-4">
+      <h3>
+        You must be
+        <a class="text-blue-600 underline" href="login.html"> logged in </a>
+        to leave a comment
+      </h3>
+    </div>
+  </div>
+  <CommentList commentData={commentData} />
+</div>

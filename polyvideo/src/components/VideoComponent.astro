@@ -1,0 +1,28 @@
+---
+import "../styles/global.css";
+const { videoData } = Astro.props;
+---
+
+<div>
+  <div>
+    <span title="Play Video"></span>
+    <video controls width="1080">
+      <source src={videoData.videoPath} type="video/mp4" />
+    </video>
+    <!-- container for custom controls, will use default for now -->
+    <div></div>
+  </div>
+  <h1 class="mt-5 text-5xl font-bold">{videoData.title}</h1>
+  <div class="flex flex-row justify-between w-auto mt-6 mb-6 max-w-5xl">
+    <div class="flex flex-row gap-1" >
+      <img class="w-10" src={videoData.authorAvatarPath} />
+      <div>
+        <h2 class="font-bold">{videoData.author}</h2>
+        <h3>{videoData.subscribers} Subscribers</h3>
+      </div>
+    </div>
+    <div>
+      <h2>{videoData.views} Views</h2>
+    </div>
+  </div>
+</div>

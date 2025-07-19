@@ -1,0 +1,21 @@
+---
+import CommentItem from "./CommentItem.astro";
+
+interface CommentItemProp{
+  author:string;
+  date:string;
+  text:string;
+  authorAvatarPath:string;
+}
+interface Props{
+  commentData:CommentItemProp[];
+}
+
+const { commentData } = Astro.props;
+---
+
+<div class="flex gap-3 flex-col">
+  {commentData.map((item) => (
+    <CommentItem commentItemData={item} />
+  ))}  
+</div>

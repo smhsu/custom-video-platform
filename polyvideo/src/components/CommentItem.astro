@@ -1,0 +1,16 @@
+---
+const { commentItemData } = Astro.props
+---
+
+<div class="flex flex-row gap-1">
+  <img class="w-10" src={commentItemData.authorAvatarPath} />  
+  <div>
+    <div class="flex flex-row gap-1.5">
+        <h3>@{commentItemData.author}</h3>
+        <p>{commentItemData.date} Ago</p>
+    </div>
+    <div>
+      {commentItemData.text}
+    </div>
+  </div>
+</div>
