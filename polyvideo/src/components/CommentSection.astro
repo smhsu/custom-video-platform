@@ -1,13 +1,25 @@
 ---
-import CommentList from "./CommentList.astro";
-// prop drilled into CommentList
+import CommentItem from "./CommentItem.astro";
+
+interface CommentItemProp{
+  author:string;
+  ageString:string;
+  text:string;
+  authorAvatarPath:string;
+}
+interface Props{
+  commentData:CommentItemProp[];
+}
+
 const { commentData } = Astro.props;
+
+const commentCount = commentData.length
 ---
 
 <div class="mt-6 mb-8">
   <div>
     <hr class="mt-4 mb-2" />
-    <h2 class="text-xl font-bold">3 Comments</h2>
+    <h2 class="text-xl font-bold">{commentCount} Comments</h2>
     <div class="bg-gray-300 rounded-sm p-4">
       <h3>
         You must be
@@ -16,5 +28,8 @@ const { commentData } = Astro.props;
       </h3>
     </div>
   </div>
-  <CommentList commentData={commentData} />
+
+  <div class="flex gap-3 flex-col">
+    {commentData.map((item) => <CommentItem commentItemData={item} />)}
+  </div>
 </div>
