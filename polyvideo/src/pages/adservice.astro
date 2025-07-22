@@ -1,9 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
-import VideoComponent from "../components/VideoComponent.astro";
+import VideoSection from "../components/VideoSection.astro"
+import CommentSection from "../components/CommentSection.astro";
 import "../styles/global.css";
-import CommentComponent from "../components/CommentComponent.astro";
 
 // DATA WILL BE HERE ()
 // Sent to each respective component via prop
@@ -23,19 +23,19 @@ const data = {
     comments: [
       {
         author: "randomuser",
-        date: "2 Months",
+        ageString: "2 Months",
         text: "this movie looks like buns (not excited for this AT ALL)",
         authorAvatarPath: "../../avatar_2.png",
       },
       {
         author: "johnn",
-        date: "6 Minutes",
+        ageString: "6 Minutes",
         text: "the 2005 movies were my introduction to marvel, i used to really really love them when i was like 8 or 9, i still really really love them, but objectively theyre bad lol 2025 will probably clear both of those movies within 5 minutes, but nevertheless i will keep rewatching the old ones frequently like i do, just a nice bit of nostalgia",
         authorAvatarPath: "../../avatar_3.png",
       },
       {
         author: "mcuFAN",
-        date: "2 Hours",
+        ageString: "2 Hours",
         text: "in FIEGE we trust",
         authorAvatarPath: "../../avatar_4.png",
       },
@@ -51,6 +51,6 @@ const data = {
 
 <Layout comments={data.option1.comments}>
   <Navbar slot="header" />
-  <VideoComponent slot="video" videoData={data.option1} />
-  <CommentComponent slot="comments" commentData={data.option1.comments}/>
+  <VideoSection slot="video" videoData={data.option1} />
+  <CommentSection slot="comments" commentData={data.option1.comments}/>
 </Layout>
