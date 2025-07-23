@@ -3,8 +3,8 @@ const { commentItemData } = Astro.props
 ---
 
 <div class="flex flex-row gap-1">
-  <img class="w-10" src={commentItemData.authorAvatarPath} />  
-  <div>
+  <img class="w-10 object-contain items-center" src={commentItemData.authorAvatarPath} />  
+  <div class="items-center">
     <div class="flex flex-row gap-1.5">
         <h3>@{commentItemData.author}</h3>
         <p>{commentItemData.ageString} Ago</p>

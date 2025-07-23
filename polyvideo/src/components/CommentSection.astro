@@ -16,7 +16,7 @@ const { commentData } = Astro.props;
 const commentCount = commentData.length
 ---
 
-<div class="mt-6 mb-8">
+<div class="mt-6 mb-8 max-w-5xl">
   <div>
     <hr class="mt-4 mb-2" />
     <h2 class="text-xl font-bold">{commentCount} Comments</h2>
@@ -29,7 +29,7 @@ const commentCount = commentData.length
     </div>
   </div>
 
-  <div class="flex gap-3 flex-col">
+  <div class="flex gap-3 flex-col space-around pt-3 pb-3">
     {commentData.map((item) => <CommentItem commentItemData={item} />)}
   </div>
 </div>
