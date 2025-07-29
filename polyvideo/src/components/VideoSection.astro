@@ -3,13 +3,38 @@ const { videoData } = Astro.props;
 ---
 
 <div class="max-w-5xl m-1">
-  <div id="vid">
+  <div class="relative">
     <span title="Play Video"></span>
-    <video controls width="1080">
+    <video width="1080">
       <source src={videoData.videoPath} type="video/mp4" />
     </video>
-    <!-- container for custom controls, will use default for now -->
-    <div></div>
+    <!-- container for custom controls -->
+    <!-- use js mouse listner instead of hover -->
+    <div class="text-white absolute -bottom-0 w-full p-3" draggable="true">
+      <!-- progress bar -->
+      <div class="relative w-full h-1 bg-gray-200 mb-2.5">
+        <!-- top-0 and left-0 ensure bar starts at bottom left -->
+        <div class="absolute top-0 left-0 h-full bg-blue-300 rounded-full" style="width: 50%;"></div>
+        <input type="range" min="0" max="100" value="50" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer rounded-full">
+      </div>
+      <div class="flex justify-between">
+        <div class="flex justify-around gap-2">
+          <!-- Remember to add accessibility options (labels  ) -->
+          <button class="cursor-pointer">
+            <img class="w-5" src="../../play.svg">
+          </button>
+          <button class="cursor-pointer">
+            <img class="w-6" src="../../volume_off.svg">
+          </button>
+          <input type="range" class="accent-gray-200 cursor-pointer">
+        </div>
+        <div class="flex justify-around gap-2">
+          <button class="cursor-pointer">
+            <img class="w-5 hover:w-6 transition-all duration-300" src="../../fullscreen.svg">
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
   <h1 class="mt-5 text-3xl font-bold">{videoData.title}</h1>
   <div class="flex flex-row justify-between w-auto mt-6 mb-6">
