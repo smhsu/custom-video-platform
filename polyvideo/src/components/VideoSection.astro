@@ -1,20 +1,17 @@
 ---
 const { videoData } = Astro.props;
-
-function updateProgress(){
-  
-}
 ---
 
 <div class="max-w-5xl m-1">
   <div class="relative">
     <span title="Play Video"></span>
-    <video width="1080">
+    <video id="media-video" width="1080">
       <source src={videoData.videoPath} type="video/mp4" />
     </video>
     <!-- container for custom controls -->
     <!-- use js mouse listner instead of hover for when container is visible -->
-    <div class="text-white absolute -bottom-0 w-full p-3">  
+    <div class="text-white absolute -bottom-0 w-full p-3">
+      <!-- Progress Bar -->
       <div class="bg-gray-200 relative w-full h-1 mb-2.5">
         <!-- top-0 and left-0 ensure bar starts at bottom left -->
          <div class="absolute h-full bg-gray-200 rounded-md"></div>
@@ -24,14 +21,29 @@ function updateProgress(){
           class="timeline-bar absolute inset-0 w-full h-full opacity-0 cursor-pointer"
          >
       </div>
+      <script is:inline>
+        // Is there a state equivalent in astro? 
+        function updateProgress(){
+          const input = document.getElementById("scrubber");
+          const progressBar = document.getElementById("progress-bar");
 
+          if (input && progressBar) {
+            input.addEventListener("input", (e) => {
+              const value = e.target.value;
+              progressBar.style.width = value + "%";
+            });
+          }
+        }
+      </script>
+
+      <!-- Video Controls -->
       <div class="flex justify-between">
         <div class="flex justify-around gap-2">
           <!-- Remember to add accessibility options (labels etc) -->
-          <button class="cursor-pointer">
+          <button id="play-btn" class="cursor-pointer">
             <img class="w-5" src="../../play.svg">
           </button>
-          <button class="cursor-pointer">
+          <button id="volume-input" class="cursor-pointer">
             <img class="w-6" src="../../volume_off.svg">
           </button>
           <input type="range" class="accent-gray-200 cursor-pointer">
@@ -42,6 +54,24 @@ function updateProgress(){
           </button>
         </div>
       </div>
+      <script>
+        const playButton = document.getElementById('play-btn')
+        // const pauseButton = document.getElementById('pause-btn')
+        // Instead will try single toggle button, but will switch between pause/play icons 
+        const video = document.getElementById('media-video')
+
+        // Need to specify HTMLVideoElement type to access play/pause property
+        if(playButton && video instanceof HTMLVideoElement){
+          playButton.addEventListener("click",() => {
+            if(video.paused){
+              video.play();
+            } else {
+              video.pause();
+            }
+          })
+        }
+      </script>
+
     </div>
   </div>
   <h1 class="mt-5 text-3xl font-bold">{videoData.title}</h1>
@@ -60,18 +90,3 @@ function updateProgress(){
   </div>
 </div>
 
-<!-- Any inline scripts need to be at the bottom of a component -->
-<script is:inline>
-  // Is there a state equivalent in astro? 
-  function updateProgress(){
-    const input = document.getElementById("scrubber");
-    const progressBar = document.getElementById("progress-bar");
-
-    if (input && progressBar) {
-      input.addEventListener("input", (e) => {
-        const value = e.target.value;
-        progressBar.style.width = value + "%";
-      });
-    }
-  }
-</script>
