@@ -1,5 +1,9 @@
 ---
 const { videoData } = Astro.props;
+
+function updateProgress(){
+  
+}
 ---
 
 <div class="max-w-5xl m-1">
@@ -9,17 +13,21 @@ const { videoData } = Astro.props;
       <source src={videoData.videoPath} type="video/mp4" />
     </video>
     <!-- container for custom controls -->
-    <!-- use js mouse listner instead of hover -->
-    <div class="text-white absolute -bottom-0 w-full p-3" draggable="true">
-      <!-- progress bar -->
-      <div class="relative w-full h-1 bg-gray-200 mb-2.5">
+    <!-- use js mouse listner instead of hover for when container is visible -->
+    <div class="text-white absolute -bottom-0 w-full p-3">  
+      <div class="bg-gray-200 relative w-full h-1 mb-2.5">
         <!-- top-0 and left-0 ensure bar starts at bottom left -->
-        <div class="absolute top-0 left-0 h-full bg-blue-300 rounded-full" style="width: 50%;"></div>
-        <input type="range" min="0" max="100" value="50" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer rounded-full">
+         <div class="absolute h-full bg-gray-200 rounded-md"></div>
+        <!-- using id for script to get element -->
+        <div id="progress-bar" class="absolute top-0 left-0 h-full bg-blue-400 rounded-md"  ></div>
+        <input id="scrubber" type="range" min="0" max="100" value="0" oninput="updateProgress(this.value)"
+          class="timeline-bar absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+         >
       </div>
+
       <div class="flex justify-between">
         <div class="flex justify-around gap-2">
-          <!-- Remember to add accessibility options (labels  ) -->
+          <!-- Remember to add accessibility options (labels etc) -->
           <button class="cursor-pointer">
             <img class="w-5" src="../../play.svg">
           </button>
@@ -51,3 +59,19 @@ const { videoData } = Astro.props;
     </div>
   </div>
 </div>
+
+<!-- Any inline scripts need to be at the bottom of a component -->
+<script is:inline>
+  // Is there a state equivalent in astro? 
+  function updateProgress(){
+    const input = document.getElementById("scrubber");
+    const progressBar = document.getElementById("progress-bar");
+
+    if (input && progressBar) {
+      input.addEventListener("input", (e) => {
+        const value = e.target.value;
+        progressBar.style.width = value + "%";
+      });
+    }
+  }
+</script>
