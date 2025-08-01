@@ -1,4 +1,6 @@
 ---
+import { Image } from "astro:assets";
+
 const { commentItemData } = Astro.props;
 
 //Gives every other comment a gray background
@@ -7,9 +9,10 @@ const containerClass = `flex flex-row gap-1 pt-2 pb-3 ${showBackground && "bg-gr
 ---
 
 <div class={containerClass}>
-  <img
+  <Image
     class="w-10 object-contain items-center"
     src={commentItemData.authorAvatarPath}
+    alt=""
   />
   <div class="items-center">
     <div class="flex flex-row gap-1.5">

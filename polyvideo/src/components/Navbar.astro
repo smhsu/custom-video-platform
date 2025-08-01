@@ -1,11 +1,16 @@
+---
+import { Image } from "astro:assets";
+import polyvideoLogo from "../assets/images/polyvideo-logo.png"
+---
+
 <header class="sticky top-[-0.0625rem] flex flex-row justify-between p-1 px-5 bg-white z-1">
-      <img class="w-42 p-0 m-0" src="../../polyvideo-logo.png">
-      <div class="flex flex-row justify-between items-center gap-1 w-full max-w-[14rem]">
-        <a class="flex-1 text-center bg-black text-white rounded py-2" href="login.html">
-          Login
-        </a>
-        <a class="flex-1 text-center bg-black text-white py-2 rounded" href="signup.html">
-          Sign Up
-        </a>
-      </div>
+  <Image class="w-42 p-0 m-0" src={polyvideoLogo} alt=""/>
+  <div class="flex flex-row justify-between items-center gap-1 w-full max-w-[14rem]">
+    <a class="flex-1 text-center bg-black text-white rounded py-2" href="login.html">
+      Login
+    </a>
+    <a class="flex-1 text-center bg-black text-white py-2 rounded" href="signup.html">
+      Sign Up
+    </a>
+  </div>
 </header>

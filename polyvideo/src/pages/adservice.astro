@@ -3,6 +3,10 @@ import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
 import VideoSection from "../components/VideoSection.astro"
 import CommentSection from "../components/CommentSection.astro";
+import avatar1 from "../assets/images/avatar_1.png"
+import avatar2 from "../assets/images/avatar_2.png"
+import avatar3 from "../assets/images/avatar_3.png"
+import avatar4 from "../assets/images/avatar_4.png"
 
 // DATA WILL BE HERE ()
 // Sent to each respective component via prop
@@ -18,7 +22,7 @@ const data = {
     author: "IGN",
     subscribers: "560K",
     views: "1.73M",
-    authorAvatarPath: "../../avatar_1.png",
+    authorAvatarPath: avatar1,
     ageString: "2 Months",
     comments: [
       {
@@ -26,21 +30,21 @@ const data = {
         author: "randomuser",
         ageString: "2 Months",
         text: "this movie looks like buns (not excited for this AT ALL)",
-        authorAvatarPath: "../../avatar_2.png",
+        authorAvatarPath: avatar2,
       },
       {
         id:"1",
         author: "johnn",
         ageString: "6 Minutes",
         text: "the 2005 movies were my introduction to marvel, i used to really really love them when i was like 8 or 9, i still really really love them, but objectively theyre bad lol 2025 will probably clear both of those movies within 5 minutes, but nevertheless i will keep rewatching the old ones frequently like i do, just a nice bit of nostalgia",
-        authorAvatarPath: "../../avatar_3.png",
+        authorAvatarPath: avatar3,
       },
       {
         id:"2",
         author: "mcuFAN",
         ageString: "2 Hours",
         text: "in FIEGE we trust",
-        authorAvatarPath: "../../avatar_4.png",
+        authorAvatarPath: avatar4,
       },
     ],
   },
