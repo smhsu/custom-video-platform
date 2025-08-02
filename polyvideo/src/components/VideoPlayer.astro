@@ -1,0 +1,64 @@
+---
+import { Image } from "astro:assets";
+import playIcon from "../assets/images/play.svg";
+import pauseIcon from "../assets/images/pause.svg";
+import fullscreenIcon from "../assets/images/fullscreen.svg";
+import volumeOn from "../assets/images/volume_on.svg";
+import volumeOff from "../assets/images/volume_off.svg";
+import volumeMute from "../assets/images/volume_mute.svg";
+const { videoSource } = Astro.props;
+---
+
+<div class="relative">
+  <span title="Play Video"></span>
+  <video id="media-video" width="1080">
+    <source src={videoSource} type="video/mp4" />
+  </video>
+  <!-- container for custom controls -->
+  <!-- use js mouse listner instead of hover for when container is visible -->
+  <div class="text-white absolute -bottom-0 w-full p-3">
+    <!-- Progress Bar -->
+    <div class="bg-gray-200 relative w-full h-1 mb-2.5">
+      <!-- top-0 and left-0 ensure bar starts at bottom left -->
+      <div class="absolute h-full bg-gray-200 rounded-md"></div>
+      <!-- using id for script to get element -->
+      <div
+        id="progress-bar"
+        class="absolute top-0 left-0 h-full bg-blue-400 rounded-md"
+      >
+      </div>
+      <input
+        id="scrubber"
+        type="range"
+        min="0"
+        max="100"
+        value="0"
+        class="timeline-bar absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      />
+    </div>
+
+    <!-- Video Controls -->
+    <div class="flex justify-between">
+      <div class="flex justify-around gap-2">
+        <!-- Remember to add accessibility options (labels etc) -->
+        <button id="play-btn" class="cursor-pointer">
+          <Image class="w-5" src={playIcon} alt="" />
+        </button>
+        <button id="volume-input" class="cursor-pointer">
+          <Image class="w-6" src={volumeOff} alt="" />
+        </button>
+        <input type="range" class="accent-gray-200 cursor-pointer" />
+      </div>
+      <div class="flex justify-around gap-2">
+        <button class="cursor-pointer">
+          <Image
+            class="w-5 hover:w-6 transition-all duration-300"
+            src={fullscreenIcon}
+            alt=""
+          />
+        </button>
+      </div>
+    </div>
+    <script type="module" src="src/scripts/video_player.ts"></script>
+  </div>
+</div>
