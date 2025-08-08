@@ -14,6 +14,8 @@ const { videoSource } = Astro.props;
     </video>
     <!-- container for custom controls -->
     <div class="text-white absolute -bottom-0 w-full p-3">
+      <!-- Bottom gradient -->
+      <div class="absolute bottom-0 left-0 h-15 w-full bg-linear-to-t from-black "></div>
       <!-- Progress Bar -->
       <div class="bg-gray-200 relative w-full h-1 mb-2.5 rounded-md">
         <div
@@ -32,7 +34,8 @@ const { videoSource } = Astro.props;
       </div>
 
       <!-- Video Controls -->
-      <div class="flex justify-between">
+      <!-- Clean up fix z-axis setup -->
+      <div class="flex justify-between scale-z-100">
         <div class="flex justify-around gap-2">
           <!-- Remember to add accessibility options (labels etc) -->
           <button id="play-btn" class="cursor-pointer">
