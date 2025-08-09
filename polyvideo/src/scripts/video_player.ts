@@ -4,30 +4,28 @@ import volumeOn from "../assets/images/volume_on.svg";
 import volumeOff from "../assets/images/volume_off.svg";
 import volumeMute from "../assets/images/volume_mute.svg";
 
-export function updateProgress() {
-    const video = document.getElementById("media-video")
+export function handleProgress(video: HTMLVideoElement) {
     const progressBar = document.getElementById("progress-bar")
 
-    if (progressBar && video instanceof HTMLVideoElement) {
+    if (progressBar) {
         video.addEventListener("timeupdate", () => {
             const currentTime = video.currentTime
             const progressFill = (currentTime / video.duration) * 100
             progressBar.style.width = progressFill + "%"
         })
     }
-    
+
     // Progress bar updates are choppy, any way to smoothen out?
     // requestAnimationFrame(updateProgress)
 
 }
 
 // Set video where user clicks on timeline
-export function userDesiredTime() {
-    const video = document.getElementById("media-video")
+export function handleTimelineClick(video:HTMLVideoElement) {
     const input = document.getElementById("scrubber");
     const progressBar = document.getElementById("progress-bar");
 
-    if (input && progressBar && video instanceof HTMLVideoElement) {
+    if (input && progressBar) {
         input.addEventListener("input", (e) => {
             if (e.target instanceof HTMLInputElement) {
                 const value = parseInt(e.target.value);
@@ -44,14 +42,13 @@ export function userDesiredTime() {
 }
 
 
-export function playVideo() {
+export function handlePlayButton(video:HTMLVideoElement) {
     const playButton = document.getElementById("play-btn");
-    const video = document.getElementById("media-video");
 
     // Button acts as a toggle between pause and play icons
     const currentIcon = document.getElementById("play-pause-icon") as HTMLImageElement
 
-    if (playButton && video instanceof HTMLVideoElement) {
+    if (playButton) {
         playButton.addEventListener("click", () => {
             if (video.paused) {
                 video.play();
@@ -65,12 +62,11 @@ export function playVideo() {
     }
 }
 
-export function muteVideo() {
-    const video = document.getElementById("media-video")
+export function handleMuteButton(video:HTMLVideoElement) {
     const muteButton = document.getElementById("mute-btn")
     const volumeIcon = document.getElementById("volume-icon") as HTMLImageElement
 
-    if (muteButton && video instanceof HTMLVideoElement) {
+    if (muteButton) {
         muteButton.addEventListener("click", () => {
             if (video.muted) {
                 //Volume will be current value of the slider
@@ -84,12 +80,11 @@ export function muteVideo() {
     }
 }
 
-export function changeVolume() {
-    const video = document.getElementById("media-video")
+export function handleVolumeSlider(video:HTMLVideoElement) {
     const volumeSlider = document.getElementById("volume-slider")
     const volumeIcon = document.getElementById("volume-icon") as HTMLImageElement
 
-    if (volumeSlider && video instanceof HTMLVideoElement) {
+    if (volumeSlider) {
         volumeSlider.addEventListener("input", (e) => {
             if (e.target instanceof HTMLInputElement) {
                 // Volume scales from 0 to 1
@@ -108,10 +103,9 @@ export function changeVolume() {
     }
 }
 
-export function fullscreenVideo() {
+export function handleFullscreen() {
     const videoContainer = document.getElementById("video-container")
     const fsButton = document.getElementById("fullscreen-btn")
-    const fsIcon = document.getElementById("fullscreen-icon") as HTMLImageElement
 
     if (fsButton && videoContainer instanceof HTMLDivElement) {
         fsButton.addEventListener("click", () => {
@@ -125,10 +119,46 @@ export function fullscreenVideo() {
     }
 }
 
+function handleCurrentTime(video: HTMLVideoElement) {
+    const displayedTime = document.getElementById("current-video-time")
+    video.addEventListener("timeupdate", () => {
+        if (displayedTime instanceof HTMLSpanElement) {
+            const currentTime = secondsToClockTime(video.currentTime);
+            displayedTime.textContent = currentTime
+        }
+    })
+}
+
+function handleVideoDuration(video: HTMLVideoElement) {
+    const displayedDuration = document.getElementById("full-video-duration")
+    if(displayedDuration instanceof HTMLSpanElement){
+        const duration = secondsToClockTime(video.duration)
+        displayedDuration.textContent = duration
+    }
+}
+
+// Only supports MM:SS format (for now?), returns formatted string
+export function secondsToClockTime(seconds: number) {
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = Math.floor(seconds % 60)
+
+    //Seconds pad with a leading zero
+    const secondsFormat = String(remainingSeconds).padStart(2, '0')
+    return `${minutes}:${secondsFormat}`
+}
+
+function init() {
+    const video = document.getElementById("media-video")
+    if (video instanceof HTMLVideoElement) {    
+        handleProgress(video);
+        handleTimelineClick(video);
+        handlePlayButton(video);
+        handleMuteButton(video);
+        handleVolumeSlider(video);
+        handleFullscreen();
+        handleCurrentTime(video);
+        handleVideoDuration(video);
+    }
+}
 // Assign event listeners automatically on load
-updateProgress();
-userDesiredTime();
-playVideo();
-muteVideo();
-changeVolume();
-fullscreenVideo();
+init()

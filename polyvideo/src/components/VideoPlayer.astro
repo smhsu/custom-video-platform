@@ -8,14 +8,16 @@ const { videoSource } = Astro.props;
 
 <div class="relative">
   <div id="video-container">
-    <span title="Play Video"></span>
     <video id="media-video" class="w-full h-full">
       <source src={videoSource} type="video/mp4" />
     </video>
     <!-- container for custom controls -->
     <div class="text-white absolute -bottom-0 w-full p-3">
       <!-- Bottom gradient -->
-      <div class="absolute bottom-0 left-0 h-15 w-full bg-linear-to-t from-black "></div>
+      <div
+        class="absolute bottom-0 left-0 h-15 w-full bg-linear-to-t from-black"
+      >
+      </div>
       <!-- Progress Bar -->
       <div class="bg-gray-200 relative w-full h-1 mb-2.5 rounded-md">
         <div
@@ -34,13 +36,18 @@ const { videoSource } = Astro.props;
       </div>
 
       <!-- Video Controls -->
-      <!-- Clean up fix z-axis setup -->
+      <!-- Need to clean up fix z-axis setup -->
       <div class="flex justify-between scale-z-100">
         <div class="flex justify-around gap-2">
           <!-- Remember to add accessibility options (labels etc) -->
           <button id="play-btn" class="cursor-pointer">
             <Image id="play-pause-icon" class="w-5" src={playIcon} alt="" />
           </button>
+          <div>
+            <span id="current-video-time">0:00</span>
+            <span> / </span>
+            <span id="full-video-duration">-:--</span>
+          </div>
           <button id="mute-btn" class="cursor-pointer">
             <Image id="volume-icon" class="w-6" src={volumeOn} alt="" />
           </button>
@@ -50,16 +57,9 @@ const { videoSource } = Astro.props;
             class="accent-gray-200 cursor-pointer"
           />
         </div>
-        <div class="flex justify-around gap-2">
-          <button id="fullscreen-btn" class="cursor-pointer">
-            <Image
-              id="fullscreen-icon"
-              class="w-5"
-              src={fullscreenIcon}
-              alt=""
-            />
-          </button>
-        </div>
+        <button id="fullscreen-btn" class="cursor-pointer">
+          <Image id="fullscreen-icon" class="w-5" src={fullscreenIcon} alt="" />
+        </button>
       </div>
       <script type="module" src="src/scripts/video_player.ts"></script>
     </div>
