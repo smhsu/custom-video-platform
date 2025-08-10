@@ -12,7 +12,7 @@ const { videoSource } = Astro.props;
       <source src={videoSource} type="video/mp4" />
     </video>
     <!-- container for custom controls -->
-    <div class="text-white absolute -bottom-0 w-full p-3">
+    <div id="custom-control-container" class="text-white absolute -bottom-0 w-full p-3 transition-opacity duration-250 ease-in-out">
       <!-- Bottom gradient -->
       <div
         class="absolute bottom-0 left-0 h-15 w-full bg-linear-to-t from-black"

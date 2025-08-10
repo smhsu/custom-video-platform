@@ -4,7 +4,7 @@ import volumeOn from "../assets/images/volume_on.svg";
 import volumeOff from "../assets/images/volume_off.svg";
 import volumeMute from "../assets/images/volume_mute.svg";
 
-export function handleProgress(video: HTMLVideoElement) {
+function handleProgress(video: HTMLVideoElement) {
     const progressBar = document.getElementById("progress-bar")
 
     if (progressBar) {
@@ -21,7 +21,7 @@ export function handleProgress(video: HTMLVideoElement) {
 }
 
 // Set video where user clicks on timeline
-export function handleTimelineClick(video:HTMLVideoElement) {
+function handleTimelineClick(video: HTMLVideoElement) {
     const input = document.getElementById("scrubber");
     const progressBar = document.getElementById("progress-bar");
 
@@ -42,7 +42,7 @@ export function handleTimelineClick(video:HTMLVideoElement) {
 }
 
 
-export function handlePlayButton(video:HTMLVideoElement) {
+function handlePlayButton(video: HTMLVideoElement) {
     const playButton = document.getElementById("play-btn");
 
     // Button acts as a toggle between pause and play icons
@@ -62,7 +62,7 @@ export function handlePlayButton(video:HTMLVideoElement) {
     }
 }
 
-export function handleMuteButton(video:HTMLVideoElement) {
+function handleMuteButton(video: HTMLVideoElement) {
     const muteButton = document.getElementById("mute-btn")
     const volumeIcon = document.getElementById("volume-icon") as HTMLImageElement
 
@@ -80,7 +80,7 @@ export function handleMuteButton(video:HTMLVideoElement) {
     }
 }
 
-export function handleVolumeSlider(video:HTMLVideoElement) {
+function handleVolumeSlider(video: HTMLVideoElement) {
     const volumeSlider = document.getElementById("volume-slider")
     const volumeIcon = document.getElementById("volume-icon") as HTMLImageElement
 
@@ -103,7 +103,7 @@ export function handleVolumeSlider(video:HTMLVideoElement) {
     }
 }
 
-export function handleFullscreen() {
+function handleFullscreen() {
     const videoContainer = document.getElementById("video-container")
     const fsButton = document.getElementById("fullscreen-btn")
 
@@ -131,25 +131,70 @@ function handleCurrentTime(video: HTMLVideoElement) {
 
 function handleVideoDuration(video: HTMLVideoElement) {
     const displayedDuration = document.getElementById("full-video-duration")
-    if(displayedDuration instanceof HTMLSpanElement){
+    if (displayedDuration instanceof HTMLSpanElement) {
         const duration = secondsToClockTime(video.duration)
         displayedDuration.textContent = duration
     }
 }
 
 // Only supports MM:SS format (for now?), returns formatted string
-export function secondsToClockTime(seconds: number) {
+function secondsToClockTime(seconds: number) {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = Math.floor(seconds % 60)
 
-    //Seconds pad with a leading zero
+    // Seconds are padded with a leading zero
     const secondsFormat = String(remainingSeconds).padStart(2, '0')
     return `${minutes}:${secondsFormat}`
 }
 
+// Works, not 100% if this is the best way however
+function handleControlHide() {
+    const videoContainer = document.getElementById("video-container")
+    const controls = document.getElementById("custom-control-container")
+
+    // setTimeout either returns a number (timeoutID or )
+    let autohideTimeout: ReturnType<typeof setTimeout>;
+
+    if (videoContainer && controls instanceof HTMLDivElement) {
+        // When mouse moves, show controls (and reset timeout timer)
+        videoContainer.addEventListener("mousemove", () => {
+            showControls(controls)
+
+            // Reset timer for hide
+            clearTimeout(autohideTimeout);
+            autohideTimeout = setTimeout(() => {
+                hideControls(controls)
+            }, 2500) // In ms, so 2.5 seconds then executes 
+        })
+
+        // When mouse leaves hide controls after 2 seconds
+        videoContainer.addEventListener("mouseleave", () => {
+            setTimeout(() =>{
+                hideControls(controls)
+            }, 2000)
+        })
+
+        // When mouse enters show controls
+        videoContainer.addEventListener("mouseenter", () => {
+            showControls(controls)
+        })
+
+    }
+}
+
+function showControls(controls: HTMLDivElement) {
+    controls.classList.remove('opacity-0')
+    controls.classList.add('opacity-100')
+}
+
+function hideControls(controls: HTMLDivElement) {
+    controls.classList.remove('opacity-100')
+    controls.classList.add('opacity-0')
+}
+
 function init() {
     const video = document.getElementById("media-video")
-    if (video instanceof HTMLVideoElement) {    
+    if (video instanceof HTMLVideoElement) {
         handleProgress(video);
         handleTimelineClick(video);
         handlePlayButton(video);
@@ -158,6 +203,7 @@ function init() {
         handleFullscreen();
         handleCurrentTime(video);
         handleVideoDuration(video);
+        handleControlHide();
     }
 }
 // Assign event listeners automatically on load
