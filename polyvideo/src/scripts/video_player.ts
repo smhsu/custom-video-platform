@@ -6,18 +6,15 @@ import volumeMute from "../assets/images/volume_mute.svg";
 
 function handleProgress(video: HTMLVideoElement) {
     const progressBar = document.getElementById("progress-bar")
+    if (!(progressBar instanceof HTMLDivElement)) return;
 
-    if (progressBar) {
-        video.addEventListener("timeupdate", () => {
-            const currentTime = video.currentTime
-            const progressFill = (currentTime / video.duration) * 100
-            progressBar.style.width = progressFill + "%"
-        })
-    }
+    video.addEventListener("timeupdate", () => {
+        const currentTime = video.currentTime
+        const progressFill = (currentTime / video.duration) * 100
+        progressBar.style.width = progressFill + "%"
+    })
 
-    // Progress bar updates are choppy, any way to smoothen out?
     // requestAnimationFrame(updateProgress)
-
 }
 
 // Set video where user clicks on timeline
@@ -25,116 +22,117 @@ function handleTimelineClick(video: HTMLVideoElement) {
     const input = document.getElementById("scrubber");
     const progressBar = document.getElementById("progress-bar");
 
-    if (input && progressBar) {
-        input.addEventListener("input", (e) => {
-            if (e.target instanceof HTMLInputElement) {
-                const value = parseInt(e.target.value);
+    if (!(input instanceof HTMLInputElement && progressBar instanceof HTMLDivElement)) return;
 
-                // Duration and current time is in seconds
-                const desiredTime = (value / 100) * video.duration
+    input.addEventListener("input", () => {
+        const value = parseInt(input.value);
 
-                // Update both video time and progress bar
-                video.currentTime = desiredTime
-                progressBar.style.width = value + "%";
-            }
-        });
-    }
+        // Duration and current time is in seconds
+        const desiredTime = (value / 100) * video.duration
+
+        // Update both video time and progress bar
+        video.currentTime = desiredTime
+        progressBar.style.width = value + "%";
+    });
 }
+
 
 
 function handlePlayButton(video: HTMLVideoElement) {
     const playButton = document.getElementById("play-btn");
-
     // Button acts as a toggle between pause and play icons
-    const currentIcon = document.getElementById("play-pause-icon") as HTMLImageElement
+    const currentIcon = document.getElementById("play-pause-icon")
 
-    if (playButton) {
-        playButton.addEventListener("click", () => {
-            if (video.paused) {
-                video.play();
-                // Change the icon from play to pause
-                currentIcon.src = pauseIcon.src
-            } else {
-                video.pause();
-                currentIcon.src = playIcon.src
-            }
-        });
-    }
+    if (!(playButton instanceof HTMLButtonElement && currentIcon instanceof HTMLImageElement)) return;
+
+    playButton.addEventListener("click", () => {
+        if (video.paused) {
+            video.play();
+            // Change the icon from play to pause
+            currentIcon.src = pauseIcon.src
+        } else {
+            video.pause();
+            currentIcon.src = playIcon.src
+        }
+    });
+
 }
 
 function handleMuteButton(video: HTMLVideoElement) {
     const muteButton = document.getElementById("mute-btn")
     const volumeIcon = document.getElementById("volume-icon") as HTMLImageElement
 
-    if (muteButton) {
-        muteButton.addEventListener("click", () => {
-            if (video.muted) {
-                //Volume will be current value of the slider
-                video.muted = false
-                volumeIcon.src = volumeOn.src
-            } else {
-                video.muted = true
-                volumeIcon.src = volumeMute.src
-            }
-        })
-    }
+    if (!(muteButton instanceof HTMLButtonElement && volumeIcon instanceof HTMLImageElement)) return;
+
+    muteButton.addEventListener("click", () => {
+        if (video.muted) {
+            //Volume will be current value of the slider
+            video.muted = false
+            volumeIcon.src = volumeOn.src
+        } else {
+            video.muted = true
+            volumeIcon.src = volumeMute.src
+        }
+    })
 }
 
 function handleVolumeSlider(video: HTMLVideoElement) {
     const volumeSlider = document.getElementById("volume-slider")
-    const volumeIcon = document.getElementById("volume-icon") as HTMLImageElement
+    const volumeIcon = document.getElementById("volume-icon")
 
-    if (volumeSlider) {
-        volumeSlider.addEventListener("input", (e) => {
-            if (e.target instanceof HTMLInputElement) {
-                // Volume scales from 0 to 1
-                const volumeLevel = parseInt(e.target.value) / 100
-                video.volume = volumeLevel
+    if (!(volumeSlider instanceof HTMLInputElement && volumeIcon instanceof HTMLImageElement)) return;
 
-                if (volumeLevel === 0) {
-                    volumeIcon.src = volumeOff.src
-                } else if (volumeIcon.src !== volumeOn.src) {
-                    // Only switch to the volume on icon if the current icon is volume off
-                    volumeIcon.src = volumeOn.src
-                }
-            }
+    volumeSlider.addEventListener("input", () => {
+        // Video volume scales from 0 to 1
+        const volumeLevel = parseFloat(volumeSlider.value)
+        video.volume = volumeLevel
 
-        })
-    }
+        if (volumeLevel === 0) {
+            volumeIcon.src = volumeOff.src
+        } else if (volumeIcon.src !== volumeOn.src) {
+            // Only switch to the volume on icon if the current icon is volume off
+            volumeIcon.src = volumeOn.src
+        }
+    })
 }
 
+
 function handleFullscreen() {
+    // Request fullscreen on div (not video) to not have the default fullscreen UI
     const videoContainer = document.getElementById("video-container")
     const fsButton = document.getElementById("fullscreen-btn")
 
-    if (fsButton && videoContainer instanceof HTMLDivElement) {
-        fsButton.addEventListener("click", () => {
-            // Request fullscreen on div to not have the default fullscreen UI
-            if (document.fullscreenElement !== videoContainer) {
-                videoContainer.requestFullscreen()
-            } else {
-                document.exitFullscreen();
-            }
-        })
-    }
+    if (!(videoContainer instanceof HTMLDivElement && fsButton instanceof HTMLButtonElement)) return;
+
+    fsButton.addEventListener("click", () => {
+        if (document.fullscreenElement !== videoContainer) {
+            videoContainer.requestFullscreen()
+        } else {
+            document.exitFullscreen();
+        }
+    })
+
 }
 
 function handleCurrentTime(video: HTMLVideoElement) {
     const displayedTime = document.getElementById("current-video-time")
+
+    if (!(displayedTime instanceof HTMLSpanElement)) return;
+
     video.addEventListener("timeupdate", () => {
-        if (displayedTime instanceof HTMLSpanElement) {
-            const currentTime = secondsToClockTime(video.currentTime);
-            displayedTime.textContent = currentTime
-        }
+        const currentTime = secondsToClockTime(video.currentTime);
+        displayedTime.textContent = currentTime
+
     })
 }
 
 function handleVideoDuration(video: HTMLVideoElement) {
     const displayedDuration = document.getElementById("full-video-duration")
-    if (displayedDuration instanceof HTMLSpanElement) {
-        const duration = secondsToClockTime(video.duration)
-        displayedDuration.textContent = duration
-    }
+
+    if (!(displayedDuration instanceof HTMLSpanElement)) return;
+
+    const duration = secondsToClockTime(video.duration)
+    displayedDuration.textContent = duration
 }
 
 // Only supports MM:SS format (for now?), returns formatted string
@@ -152,34 +150,31 @@ function handleControlHide() {
     const videoContainer = document.getElementById("video-container")
     const controls = document.getElementById("custom-control-container")
 
-    // setTimeout either returns a number (timeoutID or )
+    if (!(videoContainer instanceof HTMLDivElement && controls instanceof HTMLDivElement)) return;
+
+    // setTimeout returns a number (timeoutID)
     let autohideTimeout: ReturnType<typeof setTimeout>;
 
-    if (videoContainer && controls instanceof HTMLDivElement) {
-        // When mouse moves, show controls (and reset timeout timer)
-        videoContainer.addEventListener("mousemove", () => {
-            showControls(controls)
+    // When mouse moves, show controls (and reset timeout timer)
+    videoContainer.addEventListener("mousemove", () => {
+        showControls(controls)
 
-            // Reset timer for hide
-            clearTimeout(autohideTimeout);
-            autohideTimeout = setTimeout(() => {
-                hideControls(controls)
-            }, 2500) // In ms, so 2.5 seconds then executes 
-        })
+        // Reset timer for hide
+        clearTimeout(autohideTimeout);
+        autohideTimeout = setTimeout(() => {
+            hideControls(controls)
+        }, 3000) // In ms, so 3 seconds then executes 
+    })
 
-        // When mouse leaves hide controls after 2 seconds
-        videoContainer.addEventListener("mouseleave", () => {
-            setTimeout(() =>{
-                hideControls(controls)
-            }, 2000)
-        })
+    // When mouse leaves hide controls
+    videoContainer.addEventListener("mouseleave", () => {
+        hideControls(controls)
+    })
 
-        // When mouse enters show controls
-        videoContainer.addEventListener("mouseenter", () => {
-            showControls(controls)
-        })
-
-    }
+    // When mouse enters show controls
+    videoContainer.addEventListener("mouseenter", () => {
+        showControls(controls)
+    })
 }
 
 function showControls(controls: HTMLDivElement) {
@@ -192,19 +187,76 @@ function hideControls(controls: HTMLDivElement) {
     controls.classList.add('opacity-0')
 }
 
+function handleAdButton(video: HTMLVideoElement) {
+    const adButton = document.getElementById("play-ad-btn")
+    if (!(adButton instanceof HTMLButtonElement)) return;
+
+    const adPath = "../../ad_video.mp4"
+    const videoPath = video.currentSrc
+    let returnTime = 0;
+    let adIsPlaying = false
+
+    // Returns to where the video left off when the AD ends
+    video.addEventListener("ended", () => {
+        // Ignore if main video is playing
+        if (!adIsPlaying) return;
+
+        // Revert back to main video and set flag
+        adIsPlaying = false
+        video.src = videoPath
+        video.currentTime = returnTime
+        video.play()
+    })
+
+    adButton.addEventListener("click", () => {
+        // Store video time to go back to later
+        returnTime = video.currentTime
+
+        // Change video to ad and play immediately
+        adIsPlaying = true
+        video.src = adPath
+        video.play()
+
+        // Make Progress bar yellow and track ad time (maybe can tweak existing handleProgress function and use that)
+        // handleAdProgress(video)
+
+
+        // Have play ad button disappear when ad starts
+    })
+}
+
+// function handleAdProgress(video: HTMLVideoElement) {
+//     const progressBar = document.getElementById("progress-bar")
+
+//     if (progressBar) {
+//         video.addEventListener("timeupdate", () => {
+//             const currentTime = video.currentTime
+//             const progressFill = (currentTime / video.duration) * 100
+//             progressBar.style.width = progressFill + "%"
+//         })
+//     }
+// }
+
+// function handleSkipAdButton(video: HTMLVideoElement) {
+//     const skipButton = document.getElementById("skip-ad-btn")
+// }
+
 function init() {
     const video = document.getElementById("media-video")
-    if (video instanceof HTMLVideoElement) {
-        handleProgress(video);
-        handleTimelineClick(video);
-        handlePlayButton(video);
-        handleMuteButton(video);
-        handleVolumeSlider(video);
-        handleFullscreen();
-        handleCurrentTime(video);
-        handleVideoDuration(video);
-        handleControlHide();
-    }
+
+    if (!(video instanceof HTMLVideoElement)) return;
+
+    handleProgress(video);
+    handleTimelineClick(video);
+    handlePlayButton(video);
+    handleMuteButton(video);
+    handleVolumeSlider(video);
+    handleFullscreen();
+    handleCurrentTime(video);
+    handleVideoDuration(video);
+    handleControlHide();
+    handleAdButton(video);
+
 }
 // Assign event listeners automatically on load
 init()

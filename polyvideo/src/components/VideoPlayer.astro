@@ -12,7 +12,15 @@ const { videoSource } = Astro.props;
       <source src={videoSource} type="video/mp4" />
     </video>
     <!-- container for custom controls -->
-    <div id="custom-control-container" class="text-white absolute -bottom-0 w-full p-3 transition-opacity duration-250 ease-in-out">
+    <div id="custom-control-container" class="text-white absolute -bottom-0 w-full p-3 transition-opacity duration-350 ease-in-out">    
+      <!-- Skip Button and temporary ad playing button  -->
+      <button id="play-ad-btn" class="cursor-pointer mb-2 opacity-70 rounded-md p-1.5 bg-gray-600 hover:opacity-100">PLAY AD</button>
+      <button id="skip-ad-btn" class="flex flex-row absolute right-5 bottom-20 h-9 text-center items-center px-4 pr-1 box-content text-sm w-auto cursor-pointer rounded-[18px] bg-black/80 opacity-50 hover:bg-gray-800 hover:opacity-100 transition-opacity duration-500 ease-[cubic-bezier(0,0,.2,1)]">
+          <span class="font-medium items-center">Skip</span>
+        <span class="inline-block w-10 h-10">
+          <svg height="100%" viewBox="-6 -6 36 36" width="100%"><path d="M5,18l10-6L5,6V18L5,18z M19,6h-2v12h2V6z" fill="#fff"></path></svg>
+        </span>
+      </button>
       <!-- Bottom gradient -->
       <div
         class="absolute bottom-0 left-0 h-15 w-full bg-linear-to-t from-black"
@@ -54,6 +62,9 @@ const { videoSource } = Astro.props;
           <input
             id="volume-slider"
             type="range"
+            min="0"
+            max="1"
+            step="any"
             class="accent-gray-200 cursor-pointer"
           />
         </div>
