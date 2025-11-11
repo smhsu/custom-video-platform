@@ -1,0 +1,60 @@
+---
+import MenuItem from "../components/MenuItem.astro";
+
+const sections = [
+  {
+    name: "Appetizers",
+    items: [
+      { name: "Bruschetta", price: "$8", description: "Grilled bread with tomato, garlic, and basil." },
+      { name: "Mozzarella Sticks", price: "$7", description: "Crispy fried cheese sticks with marinara sauce." },
+      { name: "Stuffed Mushrooms", price: "$9", description: "Mushrooms stuffed with cream cheese and herbs." }
+    ],
+  },
+  {
+    name: "Salads",
+    items: [
+      { name: "Caesar Salad", price: "$10", description: "Romaine lettuce, parmesan, croutons, Caesar dressing." },
+      { name: "Greek Salad", price: "$11", description: "Tomatoes, cucumbers, olives, feta, oregano vinaigrette." }
+    ],
+  },
+  {
+    name: "Entrees",
+    items: [
+      { name: "Grilled Salmon", price: "$22", description: "Salmon fillet with lemon butter sauce, served with vegetables." },
+      { name: "Chicken Parmesan", price: "$20", description: "Breaded chicken with marinara sauce and melted mozzarella." },
+      { name: "Vegetarian Pasta", price: "$18", description: "Pasta with roasted vegetables in a light tomato sauce." }
+    ],
+  },
+  {
+    name: "Desserts",
+    items: [
+      { name: "Chocolate Lava Cake", price: "$10", description: "Warm chocolate cake with molten center." },
+      { name: "Tiramisu", price: "$9", description: "Classic espresso-soaked Italian dessert." },
+      { name: "Cheesecake", price: "$8", description: "Creamy cheesecake with a graham cracker crust." }
+    ],
+  },
+  {
+    name: "Drinks",
+    items: [
+      { name: "Lemonade", price: "$4", description: "Freshly squeezed lemonade." },
+      { name: "Iced Tea", price: "$4", description: "Brewed black tea served cold." },
+      { name: "Coffee", price: "$3", description: "Freshly brewed hot coffee." }
+    ],
+  }
+];
+---
+
+<main class="p-8 max-w-4xl mx-auto">
+  <h1 class="text-4xl font-bold mb-12 text-center">Restaurant Menu</h1>
+
+  {sections.map(section => (
+    <section class="mb-12">
+      <h2 class="text-2xl font-semibold mb-6 border-b border-gray-300 pb-2">{section.name}</h2>
+      <ul class="space-y-4">
+        {section.items.map(item => (
+          <MenuItem {...item} />
+        ))}
+      </ul>
+    </section>
+  ))}
+</main>

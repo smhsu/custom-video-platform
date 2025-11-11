@@ -1,0 +1,11 @@
+---
+const { name, price, description } = Astro.props;
+---
+
+<li class="flex justify-between border-b border-gray-200 py-2">
+  <div>
+    <h3 class="text-lg font-semibold">{name}</h3>
+    <p class="text-sm text-gray-600">{description}</p>
+  </div>
+  <span class="font-semibold text-lg">{price}</span>
+</li>
