@@ -1,17 +1,52 @@
 ---
-import MyNewComponent from "../components/MyNewComponent.astro";
-
-const myData = ["apples","oranges","grapes"];
+const menu = [
+  {
+    section: "Appetizers",
+    items: [
+      { name: "Bruschetta", price: "$8", description: "Grilled bread with tomato, garlic, and basil." },
+      { name: "Mozzarella Sticks", price: "$7", description: "Crispy fried cheese sticks with marinara sauce." },
+    ],
+  },
+  {
+    section: "Entrees",
+    items: [
+      { name: "Grilled Salmon", price: "$22", description: "Salmon with lemon butter sauce." },
+      { name: "Chicken Parmesan", price: "$20", description: "Breaded chicken with marinara and mozzarella." },
+    ],
+  },
+  {
+    section: "Desserts",
+    items: [
+      { name: "Chocolate Lava Cake", price: "$10", description: "Warm chocolate cake with molten center." },
+      { name: "Tiramisu", price: "$9", description: "Classic espresso-soaked Italian dessert." },
+    ],
+  },
+];
 ---
+
 <html lang="en">
   <head>
-    <title>My Homepage</title>
+    <title>Restaurant Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <h1>Welcome to my website!</h1>
-    { myData.map( food => <MyNewComponent food={food} />) } 
-    
-    <h1></h1>
-    <h1 />
+  <body class="bg-gray-50 p-8 font-sans">
+    <h1 class="text-4xl font-bold text-center mb-8">🍽️ Our Restaurant Menu</h1>
+
+    {menu.map(section => (
+      <section class="mb-10">
+        <h2 class="text-2xl font-semibold mb-4 border-b pb-1">{section.section}</h2>
+        <ul class="space-y-3">
+          {section.items.map(item => (
+            <li class="bg-white p-4 rounded shadow">
+              <div class="flex justify-between">
+                <h3 class="font-medium">{item.name}</h3>
+                <span class="font-semibold">{item.price}</span>
+              </div>
+              <p class="text-gray-600 text-sm">{item.description}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
   </body>
 </html>
