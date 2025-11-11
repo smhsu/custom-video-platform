@@ -3,22 +3,22 @@ const menu = [
   {
     section: "Appetizers",
     items: [
-      { name: "Bruschetta", price: "$8", description: "Grilled bread with tomato, garlic, and basil." },
-      { name: "Mozzarella Sticks", price: "$7", description: "Crispy fried cheese sticks with marinara sauce." },
+      { name: "BRUSCHETTA", price: "$8", description: "Grilled bread with tomato, garlic, and basil." },
+      { name: "MOZZARELLA STICKS", price: "$7", description: "Crispy fried cheese sticks with marinara sauce." },
     ],
   },
   {
     section: "Entrees",
     items: [
-      { name: "Grilled Salmon", price: "$22", description: "Salmon with lemon butter sauce." },
-      { name: "Chicken Parmesan", price: "$20", description: "Breaded chicken with marinara and mozzarella." },
+      { name: "GRILLED SALMON", price: "$22", description: "Salmon with lemon butter sauce." },
+      { name: "CHICKEN PARMESAN", price: "$20", description: "Breaded chicken with marinara and mozzarella." },
     ],
   },
   {
     section: "Desserts",
     items: [
-      { name: "Chocolate Lava Cake", price: "$10", description: "Warm chocolate cake with molten center." },
-      { name: "Tiramisu", price: "$9", description: "Classic espresso-soaked Italian dessert." },
+      { name: "CHOCOLATE LAVA CAKE", price: "$10", description: "Warm chocolate cake with molten center." },
+      { name: "TIRAMISU", price: "$9", description: "Classic espresso-soaked Italian dessert." },
     ],
   },
 ];
@@ -26,27 +26,30 @@ const menu = [
 
 <html lang="en">
   <head>
-    <title>Restaurant Menu</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8" />
+    <title>ALLY'S RESTAURANT</title>
+    <link rel="stylesheet" href="../styles/global.css" />
   </head>
-  <body class="bg-gray-50 p-8 font-sans">
-    <h1 class="text-4xl font-bold text-center mb-8">Our Restaurant Menu</h1>
+  <body class="bg-white font-sans">
+    <main class="max-w-4xl mx-auto p-8">
+      <h1 class="text-5xl font-extrabold text-center text-blue-900 mb-12">🍽️ Our Restaurant Menu</h1>
 
-    {menu.map(section => (
-      <section class="mb-10">
-        <h2 class="text-2xl font-semibold mb-4 border-b pb-1">{section.section}</h2>
-        <ul class="space-y-3">
-          {section.items.map(item => (
-            <li class="bg-white p-4 rounded shadow">
-              <div class="flex justify-between">
-                <h3 class="font-medium">{item.name}</h3>
-                <span class="font-semibold">{item.price}</span>
-              </div>
-              <p class="text-gray-600 text-sm">{item.description}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-    ))}
+      {menu.map(section => (
+        <section class="mb-12">
+          <h2 class="text-3xl font-bold mb-6 border-b-4 border-blue-900 pb-2 text-blue-900">{section.section}</h2>
+          <ul class="grid md:grid-cols-2 gap-6">
+            {section.items.map(item => (
+              <li class="bg-blue-900 text-white p-6 rounded-xl shadow hover:shadow-lg transition-shadow duration-200">
+                <div class="flex justify-between mb-2">
+                  <h3 class="font-semibold text-lg">{item.name}</h3>
+                  <span class="font-bold">{item.price}</span>
+                </div>
+                <p class="text-gray-200 text-sm">{item.description}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </main>
   </body>
 </html>
