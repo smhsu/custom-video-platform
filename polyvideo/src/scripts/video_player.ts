@@ -4,203 +4,151 @@ import volumeOn from "../assets/images/volume_on.svg"
 import volumeOff from "../assets/images/volume_off.svg"
 import volumeMute from "../assets/images/volume_mute.svg"
 
-type ModeName = "main" | "ad";
-
-// Contains all properties and HTML elements relevant to each mode
+// A package of relevant HTML elements
 interface Context {
     video: HTMLVideoElement;
     progressBar: HTMLDivElement;
     scrubber: HTMLInputElement;
-    mainSrc: string;
-    adSrc: string;
-    returnTime: number;
 }
 
 // Acts as the composite of mode specific behavior/functionality (If I understood composition correctly from our meeting)
 // Functionality that's shared between modes (pause play, fullscreen, etc.) are set when declaring event listeners
 interface PlayerMode {
-    name: ModeName;
+    videoSrc: string;
     canSeek: boolean;
+    isAutoHideControlsEnabled: boolean;
 
-    // Compute progress percent for the bar
-    handleProgress(ctx: Context): number;
+    // CSS class to apply to the video playback progress bar
+    progressBarCssClass: string;
 
-    handleHideControls(ctx: Context): void;
-    handleShowControls(ctx: Context): void;
-
-    hasSkipAd: boolean;
-
-    applyTheme(ctx: Context): void;
-    enter(ctx: Context): void;
-    onEnded(ctx: Context): void;
+    /**
+     * Computes the current progress of video playback in terms of a percentage (output is between 0 and 100), which
+     * will be visualized for the end user.
+     */
+    calculateProgressPercent(currentTime: number, videoDuration: number): number;
 }
 
 // Mode for main content
-const mainMode: PlayerMode = {
-    name: "main",
+const normalMode: PlayerMode = {
+    videoSrc: "", // Will be auto-set from the video element
     canSeek: true,
+    isAutoHideControlsEnabled: true, // Not implemented yet in PlayerController
+    progressBarCssClass: "bg-blue-400",
 
     // Track progress for entire video
-    handleProgress: ({ video }) => {
-        const currentTime = video.currentTime;
-        return (currentTime / video.duration) * 100;
-    },
-
-    handleHideControls(ctx) {
-        return;
-    },
-
-    handleShowControls(ctx) {
-        return;
-    },
-
-    hasSkipAd: false,
-
-    applyTheme: ({ progressBar }) => {
-        progressBar.classList.remove("bg-yellow-300");
-        progressBar.classList.add("bg-blue-400");
-    },
-    enter: (ctx) => {
-        mainMode.applyTheme(ctx);
-    },
-    onEnded: (ctx) => {
-        // Have the play icon show when main video ends
+    calculateProgressPercent: (currentTime: number, videoDuration: number) => {
+        return (currentTime / videoDuration) * 100;
     }
 };
 
 // Mode for ad
 const adMode: PlayerMode = {
-    name: "ad",
+    videoSrc: "../../ad_video.mp4",
     canSeek: false,
+    isAutoHideControlsEnabled: true, // Not implemented yet in PlayerController
+    progressBarCssClass: "bg-yellow-300",
 
     // Tracks first 5 seconds of ad
-    handleProgress: ({ video }) => {
-        const currentTime = video.currentTime;
+    calculateProgressPercent: (currentTime, videoDuration) => {
         return Math.min(100, (currentTime / 5) * 100);
     },
-
-    // Have controls present the entire ad duration
-    handleHideControls(ctx) {
-        return;
-    },
-
-    handleShowControls(ctx) {
-        return;
-    },
-
-    hasSkipAd: true,
-
-    applyTheme: (ctx) => {
-        ctx.progressBar.classList.remove("bg-blue-400");
-        ctx.progressBar.classList.add("bg-yellow-300");
-        // "Play Ad" button dissappears
-
-
-    },
-    enter: (ctx) => {
-        // Grab main video time to return to once ad finishes
-        ctx.returnTime = ctx.video.currentTime
-
-        // Switch src to ad and add theme
-        ctx.video.src = ctx.adSrc;
-        adMode.applyTheme(ctx);
-
-        // Autoplay ad
-        ctx.video.play();
-
-    },
-    // Will run both when ads end OR when the user skips ad
-    onEnded: (ctx) => {
-        // Switch src back to main content 
-        ctx.video.src = ctx.mainSrc;
-
-        // Bring main video back where it left off
-        ctx.video.currentTime = ctx.returnTime;
-
-        // Auto play main video
-        ctx.video.play();
-    }
 };
 
 class VideoController {
+    private ctx: Context;
     private mode: PlayerMode;
+    private normalModeResumptionTime: number = 0;
     // private autoHideTimeout: ReturnType<typeof setTimeout>;
 
-    constructor(private ctx: Context, private modes: Record<ModeName, PlayerMode>) {
-        this.mode = modes.main;
-
-        // Only attatch listeners once
-        this.addListeners();
-        this.mode.enter(ctx);
+    constructor(ctx: Context, initialMode: PlayerMode) {
+        this.ctx = ctx;
+        this.mode = initialMode;
+        this.switchMode(initialMode);
+        this.initPlayerControls();
     }
 
-    modeSwich(newMode: ModeName) {
-        this.mode = this.modes[newMode];
-        this.mode.enter(this.ctx);
+    private switchMode(newMode: PlayerMode) {
+        this.ctx.progressBar.classList.remove(this.mode.progressBarCssClass);
+        this.mode = newMode;
+        this.ctx.progressBar.classList.add(this.mode.progressBarCssClass);
+        this.ctx.video.src = this.mode.videoSrc;
     }
 
-    // Only supports MM:SS format, returns formatted string
-    secondsToClockTime(seconds: number) {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = Math.floor(seconds % 60);
-
-        // Seconds are padded with a leading zero
-        const secondsFormat = String(remainingSeconds).padStart(2, "0");
-        return `${minutes}:${secondsFormat}`;
+    switchToAdMode() {
+        this.normalModeResumptionTime = this.ctx.video.currentTime;
+        this.switchMode(adMode);
+        this.ctx.video.currentTime = 0;
+        this.playVideo();
     }
 
-    addListeners() {
+    switchToNormalMode() {
+        this.switchMode(normalMode);
+        this.ctx.video.currentTime = this.normalModeResumptionTime;
+        this.playVideo();
+    }
+
+    private setPlayPauseIcon(src: string) {
+        const iconImgElement = document.getElementById("play-pause-icon");
+        if (!(iconImgElement instanceof HTMLImageElement)) return;
+        iconImgElement.src = src;
+    }
+
+    playVideo() {
+        this.ctx.video.play();
+        this.setPlayPauseIcon(pauseIcon.src);
+    }
+
+    pauseVideo() {
+        this.ctx.video.pause();
+        this.setPlayPauseIcon(playIcon.src);
+    }
+
+    initPlayerControls() {
         // Grab all needed HTML elements from context
         const { video, progressBar, scrubber } = this.ctx;
 
-        // Handles progress
-        video.addEventListener("timeupdate", () => {
-            const progress = this.mode.handleProgress(this.ctx);
+        // Utility function for finding an element by ID, ensuring it exists, then attaching a function to run on click.
+        function attachClickListener(elementId: string, onClick: () => void) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            element.addEventListener("click", onClick);
+        }
 
-            progressBar.style.width = progress + "%";
+        // Handles progress display
+        video.addEventListener("timeupdate", () => {
+            let progressPercent;
+            if (this.mode.calculateProgressPercent) {
+                progressPercent = this.mode.calculateProgressPercent(video.currentTime, video.duration);
+            } else {
+                progressPercent = (video.currentTime / video.duration) * 100;
+            }
+            progressBar.style.width = progressPercent + "%";
         });
 
-
-        // Handles timeline clicks
+        // Handles timeline clicks, i.e. user requests to seek.
         scrubber.addEventListener("input", () => {
             if (!this.mode.canSeek) return;
-            const value = parseInt(scrubber.value);
 
-            // Duration and current time is in seconds
-            const desiredTime = (value / 100) * video.duration;
-
-            // Update both video time and progress bar
-            video.currentTime = desiredTime;
-            progressBar.style.width = value + "%";
+            const percentIntoVideo = parseInt(scrubber.value);
+            // Covert the percentage into the video into the number of seconds into the video
+            video.currentTime = (percentIntoVideo / 100) * video.duration;
+            progressBar.style.width = percentIntoVideo + "%";
         });
 
-
-        // Handles play/pause button (acts as toggle)
-        const playButton = document.getElementById("play-btn");
-
-        // Button acts as a toggle between pause and play icons
-        const currentIcon = document.getElementById("play-pause-icon");
-        if (!(playButton instanceof HTMLButtonElement && currentIcon instanceof HTMLImageElement)) return;
-
-        playButton.addEventListener("click", () => {
+        // Toggle play button
+        attachClickListener("play-btn", () => {
             if (video.paused) {
-                video.play();
-                // Change the icon from play to pause
-                currentIcon.src = pauseIcon.src;
+                this.playVideo();
             } else {
-                video.pause();
-                currentIcon.src = playIcon.src;
+                this.pauseVideo();
             }
         });
-
 
         // Handles video fullscreen
         // Request fullscreen on div (not video) to not have the default fullscreen UI
         const videoContainer = document.getElementById("video-container");
-        const fsButton = document.getElementById("fullscreen-btn");
-
-        if (!(videoContainer instanceof HTMLDivElement && fsButton instanceof HTMLButtonElement)) return;
-        fsButton.addEventListener("click", () => {
+        if (!(videoContainer instanceof HTMLDivElement)) return;
+        attachClickListener("fullscreen-btn", () => {
             if (document.fullscreenElement !== videoContainer) {
                 videoContainer.requestFullscreen();
             } else {
@@ -208,49 +156,25 @@ class VideoController {
             }
         });
 
-
-        // Handles Ad Play button (temporary), disappears when in ad mode
-        const adButton = document.getElementById("play-ad-btn");
-        if (!(adButton instanceof HTMLButtonElement)) return;
-
-        adButton.addEventListener("click", () => {
-            // Mode switch handles src changes, button visability, etc
-            this.modeSwich("ad");
-        })
-
+        // Handles Ad Play button (temporary), should disappear when in ad mode
+        attachClickListener("play-ad-btn", () => this.switchToAdMode());
 
         // Handles Skip Ad button, disappears when in main mode
-        const skipButton = document.getElementById("skip-ad-btn");
-        if (!(skipButton instanceof HTMLButtonElement)) return;
-
-        skipButton.addEventListener("click", () => {
-            // Currently in ad mode
-            this.mode.onEnded(this.ctx);
-
-            this.modeSwich("main");
-        });
-
+        attachClickListener("skip-ad-btn", () => this.switchToNormalMode());
 
         // Handles current time display
         const displayedTime = document.getElementById("current-video-time");
-
         if (!(displayedTime instanceof HTMLSpanElement)) return;
-
         video.addEventListener("timeupdate", () => {
-            const currentTime = this.secondsToClockTime(video.currentTime);
-            displayedTime.textContent = currentTime;
+            displayedTime.textContent = this.formatDuration(video.currentTime);
         });
 
-
-        // Handles time display for video's duration (need to put between modes as they switch)
-        const displayedDuration = document.getElementById("full-video-duration");
-
-        if (!(displayedDuration instanceof HTMLSpanElement)) return;
-
-        const duration = this.secondsToClockTime(video.duration);
-        displayedDuration.textContent = duration;
-
-
+        // Handles display for video's duration.  Automatically runs when the video's src changes.
+        video.addEventListener("loadedmetadata", () => {
+            const displayedDuration = document.getElementById("full-video-duration");
+            if (!(displayedDuration instanceof HTMLSpanElement)) return;
+            displayedDuration.textContent = this.formatDuration(this.ctx.video.duration);
+        });
         // Handles auto hiding video controls
         // const videoContainer = document.getElementById("video-container");
         // const controls = document.getElementById("custom-control-container");
@@ -265,14 +189,24 @@ class VideoController {
         // videoContainer.addEventListener("mouseleave", () => {
         //     this.mode.handleHideControls(this.ctx);
         // })
+    }
 
+    /**
+     * Converts a number in seconds to a formatted string of MM:SS.  Note that this will not format hours; e.g. a
+     * duration of 110 minutes will be displayed as 110:00.
+     */
+    formatDuration(seconds: number) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+
+        // Seconds are padded with a leading zero
+        const secondsFormat = String(remainingSeconds).padStart(2, "0");
+        return `${minutes}:${secondsFormat}`;
     }
 }
 
 
 function init() {
-
-    // Document queries on mode specific elements to create Context 
     const video = document.getElementById("media-video");
     const progressBar = document.getElementById("progress-bar");
     const scrubber = document.getElementById("scrubber");
@@ -284,15 +218,12 @@ function init() {
     const ctx: Context = {
         video,
         progressBar,
-        scrubber,
-        mainSrc: video.currentSrc,
-        adSrc: "../../ad_video.mp4",
-        // Will be assigned once ad played
-        returnTime: 0,
+        scrubber
     };
 
+    normalMode.videoSrc = video.currentSrc;
     // Create VideoController instance
-    const controller = new VideoController(ctx, { main: mainMode, ad: adMode });
+    const controller = new VideoController(ctx, normalMode);
 }
 
 init();
