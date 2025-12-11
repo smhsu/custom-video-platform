@@ -4,6 +4,15 @@ import volumeOn from "../assets/images/volume_on.svg"
 import volumeOff from "../assets/images/volume_off.svg"
 import volumeMute from "../assets/images/volume_mute.svg"
 
+/**
+ * TODOs
+ *
+ * Place ad at some configured time
+ * Volume slider
+ * Make sure ad elements -- play ad and skip buttons appear at the right time and screen location
+ * Video scrubber mouse clicks are not completely precise
+ */
+
 // A package of relevant HTML elements
 interface Context {
     video: HTMLVideoElement;
