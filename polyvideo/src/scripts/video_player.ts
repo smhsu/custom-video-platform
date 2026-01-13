@@ -179,7 +179,7 @@ class VideoController {
             } else {
                 document.exitFullscreen();
             }
-        })
+        });
 
         // Handles Ad Play button (temporary), should disappear when in ad mode
         attachClickListener("play-ad-btn", () => this.switchToAdMode());
