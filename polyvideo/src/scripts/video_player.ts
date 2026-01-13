@@ -11,6 +11,8 @@ import volumeMute from "../assets/images/volume_mute.svg"
  * Volume slider
  * Make sure ad elements -- play ad and skip buttons appear at the right time and screen location
  * Video scrubber mouse clicks are not completely precise
+ * Change profile icons
+ * Re-add Auto Hide Controls
  */
 
 // A package of relevant HTML elements
@@ -20,7 +22,7 @@ interface Context {
     scrubber: HTMLInputElement;
 }
 
-// Acts as the composite of mode specific behavior/functionality (If I understood composition correctly from our meeting)
+// Acts as the composite of mode specific behavior/functionality
 // Functionality that's shared between modes (pause play, fullscreen, etc.) are set when declaring event listeners
 interface PlayerMode {
     videoSrc: string;
@@ -54,11 +56,11 @@ const normalMode: PlayerMode = {
 const adMode: PlayerMode = {
     videoSrc: "../../ad_video.mp4",
     canSeek: false,
-    isAutoHideControlsEnabled: true, // Not implemented yet in PlayerController
+    isAutoHideControlsEnabled: false, // Not implemented yet in PlayerController
     progressBarCssClass: "bg-yellow-300",
 
     // Tracks first 5 seconds of ad
-    calculateProgressPercent: (currentTime, videoDuration) => {
+    calculateProgressPercent: (currentTime: number, videoDuration: number) => {
         return Math.min(100, (currentTime / 5) * 100);
     },
 };
@@ -112,6 +114,18 @@ class VideoController {
         this.setPlayPauseIcon(playIcon.src);
     }
 
+    private showSkipAdButton(progressPercent: number) {
+        const skipAdBtn = document.getElementById("skip-ad-btn");
+        if(!(skipAdBtn instanceof HTMLButtonElement)) return;
+        if(this.mode !== adMode){
+            skipAdBtn.hidden = true;
+            return;
+        }
+
+        // If in adMode and 5 seconds have passed (tracked by progressPercent), display skip button
+        skipAdBtn.hidden = progressPercent >= 100 ? false : true;
+    }
+
     initPlayerControls() {
         // Grab all needed HTML elements from context
         const { video, progressBar, scrubber } = this.ctx;
@@ -132,6 +146,8 @@ class VideoController {
                 progressPercent = (video.currentTime / video.duration) * 100;
             }
             progressBar.style.width = progressPercent + "%";
+
+            this.showSkipAdButton(progressPercent);            
         });
 
         // Handles timeline clicks, i.e. user requests to seek.
@@ -163,7 +179,7 @@ class VideoController {
             } else {
                 document.exitFullscreen();
             }
-        });
+        })
 
         // Handles Ad Play button (temporary), should disappear when in ad mode
         attachClickListener("play-ad-btn", () => this.switchToAdMode());
