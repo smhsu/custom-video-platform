@@ -69,6 +69,7 @@ class VideoController {
     private ctx: Context;
     private mode: PlayerMode;
     private normalModeResumptionTime: number = 0;
+    private isVolumeOffIconShown: boolean = false;
     // private autoHideTimeout: ReturnType<typeof setTimeout>;
 
     constructor(ctx: Context, initialMode: PlayerMode) {
@@ -104,6 +105,12 @@ class VideoController {
         iconImgElement.src = src;
     }
 
+    private setVolumeIcon(src: string) {
+        const iconImgElement = document.getElementById("volume-icon");
+        if (!(iconImgElement instanceof HTMLImageElement)) return;
+        iconImgElement.src = src;
+    }
+
     playVideo() {
         this.ctx.video.play();
         this.setPlayPauseIcon(pauseIcon.src);
@@ -116,8 +123,8 @@ class VideoController {
 
     private showSkipAdButton(progressPercent: number) {
         const skipAdBtn = document.getElementById("skip-ad-btn");
-        if(!(skipAdBtn instanceof HTMLButtonElement)) return;
-        if(this.mode !== adMode){
+        if (!(skipAdBtn instanceof HTMLButtonElement)) return;
+        if (this.mode !== adMode) {
             skipAdBtn.hidden = true;
             return;
         }
@@ -200,6 +207,33 @@ class VideoController {
             if (!(displayedDuration instanceof HTMLSpanElement)) return;
             displayedDuration.textContent = this.formatDuration(this.ctx.video.duration);
         });
+
+        // Handles muting video
+        attachClickListener("mute-btn", () => {
+            const isMuted = this.ctx.video.muted;
+            if (isMuted) {
+                this.setVolumeIcon(volumeOn.src);
+            } else {
+                this.setVolumeIcon(volumeMute.src);
+            }
+            this.ctx.video.muted = !isMuted;
+        });
+
+        // Handles user request to change volume using the slider
+        const volumeSlider = document.getElementById("volume-slider");
+        if (!(volumeSlider instanceof HTMLInputElement)) return;
+        volumeSlider.addEventListener("input", () => {
+            const volumeLevel = parseInt(volumeSlider.value);
+            this.ctx.video.volume = (volumeLevel / 100);
+            if (volumeLevel === 0 && !this.isVolumeOffIconShown) {
+                this.setVolumeIcon(volumeOff.src);
+                this.isVolumeOffIconShown = true;
+            } else if (volumeLevel > 0 && this.isVolumeOffIconShown) {
+                this.setVolumeIcon(volumeOn.src)
+                this.isVolumeOffIconShown = false;
+            }
+        });
+
         // Handles auto hiding video controls
         // const videoContainer = document.getElementById("video-container");
         // const controls = document.getElementById("custom-control-container");
@@ -243,7 +277,7 @@ function init() {
     const ctx: Context = {
         video,
         progressBar,
-        scrubber
+        scrubber,
     };
 
     normalMode.videoSrc = video.currentSrc;
