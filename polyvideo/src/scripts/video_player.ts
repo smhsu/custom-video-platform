@@ -69,7 +69,7 @@ class VideoController {
     private ctx: Context;
     private mode: PlayerMode;
     private normalModeResumptionTime: number = 0;
-    private isVolumeOffIconShown: boolean = false;
+    private currentVolumeIcon: string |null = null;
     // private autoHideTimeout: ReturnType<typeof setTimeout>;
 
     constructor(ctx: Context, initialMode: PlayerMode) {
@@ -105,10 +105,24 @@ class VideoController {
         iconImgElement.src = src;
     }
 
-    private setVolumeIcon(src: string) {
+    private updateVolumeIcon() {
+        // Icon dependant on state of volume
+        let nextSrc: string;
+        if (this.ctx.video.muted) {
+            nextSrc = volumeMute.src;
+        } else if (this.ctx.video.volume === 0) {
+            nextSrc = volumeOff.src;
+        } else {
+            nextSrc = volumeOn.src;
+        }
         const iconImgElement = document.getElementById("volume-icon");
         if (!(iconImgElement instanceof HTMLImageElement)) return;
-        iconImgElement.src = src;
+
+        // Check if icon src changes to prevent constant DOM changes
+        if (this.currentVolumeIcon !== nextSrc) {
+            iconImgElement.src = nextSrc;
+            this.currentVolumeIcon = iconImgElement.src;
+        }
     }
 
     playVideo() {
@@ -119,6 +133,11 @@ class VideoController {
     pauseVideo() {
         this.ctx.video.pause();
         this.setPlayPauseIcon(playIcon.src);
+    }
+
+    muteVideoToggle() {
+        this.ctx.video.muted = !this.ctx.video.muted;
+        this.updateVolumeIcon();
     }
 
     private showSkipAdButton(progressPercent: number) {
@@ -136,6 +155,9 @@ class VideoController {
     initPlayerControls() {
         // Grab all needed HTML elements from context
         const { video, progressBar, scrubber } = this.ctx;
+
+        // Initialize volume icon
+        this.updateVolumeIcon();
 
         // Utility function for finding an element by ID, ensuring it exists, then attaching a function to run on click.
         function attachClickListener(elementId: string, onClick: () => void) {
@@ -209,29 +231,20 @@ class VideoController {
         });
 
         // Handles muting video
-        attachClickListener("mute-btn", () => {
-            const isMuted = this.ctx.video.muted;
-            if (isMuted) {
-                this.setVolumeIcon(volumeOn.src);
-            } else {
-                this.setVolumeIcon(volumeMute.src);
-            }
-            this.ctx.video.muted = !isMuted;
-        });
+        attachClickListener("mute-btn", () => this.muteVideoToggle());
 
         // Handles user request to change volume using the slider
         const volumeSlider = document.getElementById("volume-slider");
         if (!(volumeSlider instanceof HTMLInputElement)) return;
         volumeSlider.addEventListener("input", () => {
             const volumeLevel = parseInt(volumeSlider.value);
-            this.ctx.video.volume = (volumeLevel / 100);
-            if (volumeLevel === 0 && !this.isVolumeOffIconShown) {
-                this.setVolumeIcon(volumeOff.src);
-                this.isVolumeOffIconShown = true;
-            } else if (volumeLevel > 0 && this.isVolumeOffIconShown) {
-                this.setVolumeIcon(volumeOn.src)
-                this.isVolumeOffIconShown = false;
+            this.ctx.video.volume = volumeLevel / 100;
+            
+            // If user changes volume slider while muted, automatically umute
+            if (volumeLevel > 0 && this.ctx.video.muted) {
+                this.muteVideoToggle();
             }
+            this.updateVolumeIcon();
         });
 
         // Handles auto hiding video controls
