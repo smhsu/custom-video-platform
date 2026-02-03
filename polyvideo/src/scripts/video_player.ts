@@ -13,10 +13,6 @@ import volumeMute from "../assets/images/volume_mute.svg"
  * Video scrubber mouse clicks are not completely precise
  * Change profile icons
  * Re-add Auto Hide Controls
- * Refactor to make it two that overlap (two astro VideoPlayers) change ids to classes when querying
- *      Init on videoPLayerRoot and class select
- *      before add eventlistener on load and init on each unique videoPlayer (query selectorAll)
- *      document add listner load
  */
 
 // A package of relevant HTML elements
@@ -41,6 +37,8 @@ interface PlayerMode {
      * will be visualized for the end user.
      */
     calculateProgressPercent(currentTime: number, videoDuration: number): number;
+
+    hideSkipAdButton(progressPercent: number): boolean;
 }
 
 // Mode for main content
@@ -53,7 +51,9 @@ const normalMode: PlayerMode = {
     // Track progress for entire video
     calculateProgressPercent: (currentTime: number, videoDuration: number) => {
         return (currentTime / videoDuration) * 100;
-    }
+    },
+
+    hideSkipAdButton: (progressPercent: number) => {return true}
 };
 
 // Mode for ad
@@ -67,6 +67,11 @@ const adMode: PlayerMode = {
     calculateProgressPercent: (currentTime: number, videoDuration: number) => {
         return Math.min(100, (currentTime / 5) * 100);
     },
+
+    hideSkipAdButton: (progressPercent: number) => {
+        // If in adMode and 5 seconds have passed (tracked by progressPercent), display skip button
+        return progressPercent >= 100 ? false : true;
+    }
 };
 
 class VideoController {
@@ -144,18 +149,6 @@ class VideoController {
         this.updateVolumeIcon();
     }
 
-    private showSkipAdButton(progressPercent: number) {
-        const skipAdBtn = document.getElementById("skip-ad-btn");
-        if (!(skipAdBtn instanceof HTMLButtonElement)) return;
-        if (this.mode !== adMode) {
-            skipAdBtn.hidden = true;
-            return;
-        }
-
-        // If in adMode and 5 seconds have passed (tracked by progressPercent), display skip button
-        skipAdBtn.hidden = progressPercent >= 100 ? false : true;
-    }
-
     initPlayerControls() {
         // Grab all needed HTML elements from context
         const { video, progressBar, scrubber } = this.ctx;
@@ -170,7 +163,9 @@ class VideoController {
             element.addEventListener("click", onClick);
         }
 
-        // Handles progress display
+        // Handles progress display and visibility of the skip ad button
+        const skipAdBtn = document.getElementById("skip-ad-btn");
+        if (!(skipAdBtn instanceof HTMLButtonElement)) return;
         video.addEventListener("timeupdate", () => {
             let progressPercent;
             if (this.mode.calculateProgressPercent) {
@@ -180,7 +175,9 @@ class VideoController {
             }
             progressBar.style.width = progressPercent + "%";
 
-            this.showSkipAdButton(progressPercent);            
+            if (this.mode.hideSkipAdButton){
+                skipAdBtn.hidden = this.mode.hideSkipAdButton(progressPercent);
+            }
         });
 
         // Handles timeline clicks, i.e. user requests to seek.
