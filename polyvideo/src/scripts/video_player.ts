@@ -13,6 +13,10 @@ import volumeMute from "../assets/images/volume_mute.svg"
  * Video scrubber mouse clicks are not completely precise
  * Change profile icons
  * Re-add Auto Hide Controls
+ * Refactor to make it two that overlap (two astro VideoPlayers) change ids to classes when querying
+ *      Init on videoPLayerRoot and class select
+ *      before add eventlistener on load and init on each unique videoPlayer (query selectorAll)
+ *      document add listner load
  */
 
 // A package of relevant HTML elements
