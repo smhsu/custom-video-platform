@@ -39,6 +39,8 @@ interface PlayerMode {
     calculateProgressPercent(currentTime: number, videoDuration: number): number;
 
     hideSkipAdButton(progressPercent: number): boolean;
+
+    shouldAdAppear(progressPercent: number): boolean;
 }
 
 // Mode for main content
@@ -53,7 +55,10 @@ const normalMode: PlayerMode = {
         return (currentTime / videoDuration) * 100;
     },
 
-    hideSkipAdButton: (progressPercent: number) => {return true}
+    hideSkipAdButton: (progressPercent: number) => true,
+
+    // Currently plays ad 50% through the video
+    shouldAdAppear: (progressPercent: number) => progressPercent > 50
 };
 
 // Mode for ad
@@ -71,13 +76,17 @@ const adMode: PlayerMode = {
     hideSkipAdButton: (progressPercent: number) => {
         // If in adMode and 5 seconds have passed (tracked by progressPercent), display skip button
         return progressPercent >= 100 ? false : true;
-    }
+    },
+
+    shouldAdAppear: (progressPercent: number) => false
 };
 
 class VideoController {
     private ctx: Context;
     private mode: PlayerMode;
     private normalModeResumptionTime: number = 0;
+    // Flag to track if viewer has watched an ad (only checks one ad)
+    private adPlayed: boolean;
     // private autoHideTimeout: ReturnType<typeof setTimeout>;
 
     constructor(ctx: Context, initialMode: PlayerMode) {
@@ -85,6 +94,7 @@ class VideoController {
         this.mode = initialMode;
         this.switchMode(initialMode);
         this.initPlayerControls();
+        this.adPlayed = false;
     }
 
     private switchMode(newMode: PlayerMode) {
@@ -99,6 +109,7 @@ class VideoController {
         this.switchMode(adMode);
         this.ctx.video.currentTime = 0;
         this.playVideo();
+        this.adPlayed = true;
     }
 
     switchToNormalMode() {
@@ -172,6 +183,10 @@ class VideoController {
 
             if (this.mode.hideSkipAdButton){
                 skipAdBtn.hidden = this.mode.hideSkipAdButton(progressPercent);
+            }
+
+            if (this.mode.shouldAdAppear(progressPercent) && !this.adPlayed){
+                this.switchToAdMode();
             }
         });
 
