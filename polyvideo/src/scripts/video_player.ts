@@ -78,7 +78,6 @@ class VideoController {
     private ctx: Context;
     private mode: PlayerMode;
     private normalModeResumptionTime: number = 0;
-    private currentVolumeIcon: string |null = null;
     // private autoHideTimeout: ReturnType<typeof setTimeout>;
 
     constructor(ctx: Context, initialMode: PlayerMode) {
@@ -127,11 +126,7 @@ class VideoController {
         const iconImgElement = document.getElementById("volume-icon");
         if (!(iconImgElement instanceof HTMLImageElement)) return;
 
-        // Check if icon src changes to prevent constant DOM changes
-        if (this.currentVolumeIcon !== nextSrc) {
-            iconImgElement.src = nextSrc;
-            this.currentVolumeIcon = iconImgElement.src;
-        }
+        iconImgElement.src = nextSrc;
     }
 
     playVideo() {
