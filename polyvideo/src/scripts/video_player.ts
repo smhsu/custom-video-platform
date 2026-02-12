@@ -4,15 +4,22 @@ import volumeOn from "../assets/images/volume_on.svg"
 import volumeOff from "../assets/images/volume_off.svg"
 import volumeMute from "../assets/images/volume_mute.svg"
 
+const AD_ADVANCE_WARNING = 35 // Percent into video when first warning appears
+const AD_PLAYS = 50 // Percent into the video when ad plays
+
 /**
  * TODOs
  *
  * Place ad at some configured time
  * Volume slider
  * Make sure ad elements -- play ad and skip buttons appear at the right time and screen location
+ * Bottom right persistant play ad button that is dismissable
+ * Above tick, "Ad will play here" notification that disappears on autohide
+ * Add ad location tick
  * Video scrubber mouse clicks are not completely precise
  * Change profile icons
  * Re-add Auto Hide Controls
+ * Autoskip when ad ends
  */
 
 // A package of relevant HTML elements
@@ -28,10 +35,11 @@ interface PlayerMode {
     videoSrc: string;
     canSeek: boolean;
     isAutoHideControlsEnabled: boolean;
+    shouldAdAppear: boolean;
 
     // CSS class to apply to the video playback progress bar
     progressBarCssClass: string;
-
+    
     /**
      * Computes the current progress of video playback in terms of a percentage (output is between 0 and 100), which
      * will be visualized for the end user.
@@ -40,7 +48,7 @@ interface PlayerMode {
 
     hideSkipAdButton(progressPercent: number): boolean;
 
-    shouldAdAppear(progressPercent: number): boolean;
+    hidePlayAdButton(progressPercent: number): boolean;
 }
 
 // Mode for main content
@@ -48,8 +56,9 @@ const normalMode: PlayerMode = {
     videoSrc: "", // Will be auto-set from the video element
     canSeek: true,
     isAutoHideControlsEnabled: true, // Not implemented yet in PlayerController
+    shouldAdAppear: true, // Currently plays ad 50% through the video
     progressBarCssClass: "bg-blue-400",
-
+    
     // Track progress for entire video
     calculateProgressPercent: (currentTime: number, videoDuration: number) => {
         return (currentTime / videoDuration) * 100;
@@ -57,8 +66,9 @@ const normalMode: PlayerMode = {
 
     hideSkipAdButton: (progressPercent: number) => true,
 
-    // Currently plays ad 50% through the video
-    shouldAdAppear: (progressPercent: number) => progressPercent > 50
+    hidePlayAdButton: (progressPercent: number) => {
+        return progressPercent > AD_ADVANCE_WARNING
+    }
 };
 
 // Mode for ad
@@ -66,6 +76,7 @@ const adMode: PlayerMode = {
     videoSrc: "../../ad_video.mp4",
     canSeek: false,
     isAutoHideControlsEnabled: false, // Not implemented yet in PlayerController
+    shouldAdAppear: false,
     progressBarCssClass: "bg-yellow-300",
 
     // Tracks first 5 seconds of ad
@@ -75,10 +86,10 @@ const adMode: PlayerMode = {
 
     hideSkipAdButton: (progressPercent: number) => {
         // If in adMode and 5 seconds have passed (tracked by progressPercent), display skip button
-        return progressPercent >= 100 ? false : true;
+        return progressPercent < 100;
     },
 
-    shouldAdAppear: (progressPercent: number) => false
+    hidePlayAdButton: (progressPercent: number) => true
 };
 
 class VideoController {
@@ -185,7 +196,7 @@ class VideoController {
                 skipAdBtn.hidden = this.mode.hideSkipAdButton(progressPercent);
             }
 
-            if (this.mode.shouldAdAppear(progressPercent) && !this.adPlayed){
+            if (this.mode.shouldAdAppear && !this.adPlayed && progressPercent > AD_PLAYS){
                 this.switchToAdMode();
             }
         });
@@ -226,6 +237,9 @@ class VideoController {
 
         // Handles Skip Ad button, disappears when in main mode
         attachClickListener("skip-ad-btn", () => this.switchToNormalMode());
+        
+        // Handles Ad Play notification dismissal
+        attachClickListener("play-ad-dismiss-btn", () => console.log("works"));
 
         // Handles current time display
         const displayedTime = document.getElementById("current-video-time");

@@ -26,11 +26,25 @@ Add "Ad soon, play now?" notification somewhere on the screen. It should appear 
       class="text-white absolute -bottom-0 w-full p-3 transition-opacity duration-350 ease-in-out"
     >
       <!-- Skip Button and temporary ad playing button  -->
-      <button
-        id="play-ad-btn"
-        class="cursor-pointer mb-2 opacity-70 rounded-md p-1.5 bg-gray-600 hover:opacity-100"
-        >PLAY AD</button
-      >
+      <div class="flex flex-col absolute right-5 bottom-18 max-h-15 max-w-20 pt-2 pb-2 pl-5 pr-5 text-center items-center box-content text-sm cursor-pointer rounded-lg bg-black/80 opacity-50 hover:bg-gray-800 hover:opacity-100 transition-opacity duration-500 ease-[cubic-bezier(0,0,.2,1)]">
+        <button
+          id="play-ad-dismiss-btn"
+          class="absolute top-0.5 right-1 cursor-pointer">
+          <span class="inline-block max-h-5 max-w-5">
+            <svg height="100%" viewBox="-6 -6 36 36" width="100%"
+              ><path d="M7.1,6.1L12,11l4.9-4.9l1.4,1.4L13.4,12l4.9,4.9l-1.4,1.4L12,13.4l-4.9,4.9l-1.4-1.4L10.6,12L5.7,7.5L7.1,6.1z" fill="#fff"
+              ></path></svg
+            >
+          </span>
+        </button>
+        <button
+          id="play-ad-btn"
+          class="cursor-pointer"
+          >
+          <span class="font-medium items-center">Ad Soon<br>Play Now?</span>
+        </button>
+      </div>
+      
       <button
         id="skip-ad-btn"
         class="flex flex-row absolute right-5 bottom-20 h-9 text-center items-center px-4 pr-1 box-content text-sm w-auto cursor-pointer rounded-[18px] bg-black/80 opacity-50 hover:bg-gray-800 hover:opacity-100 transition-opacity duration-500 ease-[cubic-bezier(0,0,.2,1)]"
@@ -48,16 +62,19 @@ Add "Ad soon, play now?" notification somewhere on the screen. It should appear 
         class="absolute bottom-0 left-0 h-15 w-full bg-linear-to-t from-black"
       >
       </div>
-      <!-- Ad Notification -->
-      <!-- <div class="absolute z-[999] h-3 top-0">
-        <div class="w-1 h-full bg-yellow-300 opacity-100"></div>
-        <div class="tooltip" >
-          <div><div>Ad soon,</div><div>play now?</div></div>
-          <div class="tooltip-triangle"></div>
-        </div>
-      </div> -->
+      
       <!-- Progress Bar -->
       <div class="bg-gray-200 relative w-full h-1 mb-2.5 rounded-md">
+        <!-- Ad Notification (temp pixel offset relative to ad placement) -->
+        <!-- <div id="next-ad-container" class="absolute z-[999] h-3 top-0 content-center" style="left: 50%">
+          <div id="marker" class="w-1 h-full bg-yellow-300 opacity-100"></div>
+          <div id="tooltip" class="absolute bg-[rgba(32,32,32,0.8)] text-white font-bold px-3 py-2 rounded-lg text-sm z-[9999] whitespace-nowrap transition-opacity duration-300 ease-in-out opacity-100 text-center leading-[1.3em]">
+            <div id="play-ad-btn" class="cursor-pointer">
+              <div><div>Ad soon,</div><div>play now?</div></div>
+              <div id="tooltip triangle"></div>
+            </button>
+          </div>
+        </div> -->
         <div
           id="progress-bar"
           class="absolute top-0 left-0 h-full bg-blue-400 rounded-md"
