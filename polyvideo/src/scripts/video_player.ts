@@ -8,17 +8,22 @@ const AD_ADVANCE_WARNING = 30 // Percent into video when first warning appears
 const AD_PLAYS = 50 // Percent into the video when ad plays
 
 /**
- * TODOs
+ * MVP features
+ * Dismissable ad soon button
+ * Tick mark and small panel that explains it
+ * Auto-hiding controls
+ * Goes back to play the video when ad finishes
+ * There is a telemetry system in place (requires backend)
+ *      Set up database...
+ *      Set up backend API...
+ */
+
+/**
+ * Other nice to haves
  *
- * Place ad at some configured time
- * Volume slider
- * Make sure ad elements -- play ad and skip buttons appear at the right time and screen location
- * Bottom right persistant play ad button that is dismissable
- * Above tick, "Ad will play here" notification that disappears on autohide
- * Add ad location tick
+ * Polish styles cross-platform
  * Video scrubber mouse clicks are not completely precise
  * Change profile icons
- * Re-add Auto Hide Controls
  * Autoskip when ad ends
  */
 
