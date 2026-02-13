@@ -232,14 +232,18 @@ class VideoController {
             }
         });
 
+        // Handles Skip Ad button, disappears when in main mode
+        attachClickListener("skip-ad-btn", () => this.switchToNormalMode());
+
         // Handles Ad Play button (temporary), should disappear when in ad mode
         attachClickListener("play-ad-btn", () => this.switchToAdMode());
 
-        // Handles Skip Ad button, disappears when in main mode
-        attachClickListener("skip-ad-btn", () => this.switchToNormalMode());
-        
         // Handles Ad Play notification dismissal
-        attachClickListener("play-ad-dismiss-btn", () => console.log("works"));
+        const playAdContainer = document.getElementById("play-ad-container");
+        if (!(playAdContainer instanceof HTMLDivElement)) return;
+        attachClickListener("play-ad-dismiss-btn", () => {
+            playAdContainer.hidden = true
+        });
 
         // Handles current time display
         const displayedTime = document.getElementById("current-video-time");
