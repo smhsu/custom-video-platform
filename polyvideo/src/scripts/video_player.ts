@@ -4,7 +4,7 @@ import volumeOn from "../assets/images/volume_on.svg"
 import volumeOff from "../assets/images/volume_off.svg"
 import volumeMute from "../assets/images/volume_mute.svg"
 
-const AD_ADVANCE_WARNING = 35 // Percent into video when first warning appears
+const AD_ADVANCE_WARNING = 30 // Percent into video when first warning appears
 const AD_PLAYS = 50 // Percent into the video when ad plays
 
 /**
@@ -39,7 +39,7 @@ interface PlayerMode {
 
     // CSS class to apply to the video playback progress bar
     progressBarCssClass: string;
-    
+
     /**
      * Computes the current progress of video playback in terms of a percentage (output is between 0 and 100), which
      * will be visualized for the end user.
@@ -58,7 +58,7 @@ const normalMode: PlayerMode = {
     isAutoHideControlsEnabled: true, // Not implemented yet in PlayerController
     shouldAdAppear: true, // Currently plays ad 50% through the video
     progressBarCssClass: "bg-blue-400",
-    
+
     // Track progress for entire video
     calculateProgressPercent: (currentTime: number, videoDuration: number) => {
         if (!Number.isFinite(videoDuration)) return 0;
@@ -67,6 +67,7 @@ const normalMode: PlayerMode = {
 
     hideSkipAdButton: (progressPercent: number) => true,
 
+    // Should check for this (and the skip button be here or moved to videoController also?)
     hidePlayAdButton: (progressPercent: number) => {
         return progressPercent < AD_ADVANCE_WARNING
     }
@@ -117,11 +118,11 @@ class VideoController {
     }
 
     switchToAdMode() {
+        this.adPlayed = true;
         this.normalModeResumptionTime = this.ctx.video.currentTime;
         this.switchMode(adMode);
         this.ctx.video.currentTime = 0;
         this.playVideo();
-        this.adPlayed = true;
     }
 
     switchToNormalMode() {
@@ -195,16 +196,17 @@ class VideoController {
             }
             progressBar.style.width = progressPercent + "%";
 
-            if (this.mode.hideSkipAdButton){
+            if (this.mode.hideSkipAdButton) {
                 skipAdBtn.hidden = this.mode.hideSkipAdButton(progressPercent);
             }
 
-            if (this.mode.shouldAdAppear && !this.adPlayed && progressPercent > AD_PLAYS){
+            // Tracking progress with videoController instead
+            if (this.mode.shouldAdAppear && !this.adPlayed && progressPercent > AD_PLAYS) {
                 this.switchToAdMode();
             }
 
-            if (this.mode.hidePlayAdButton && !this.adPlayed){
-                playAdContainer.hidden = this.mode.hidePlayAdButton(progressPercent);
+            if (this.mode.hidePlayAdButton) {
+                playAdContainer.hidden = this.adPlayed ? true : this.mode.hidePlayAdButton(progressPercent);
             }
         });
 
@@ -273,7 +275,7 @@ class VideoController {
         volumeSlider.addEventListener("input", () => {
             const volumeLevel = parseInt(volumeSlider.value);
             this.ctx.video.volume = volumeLevel / 100;
-            
+
             // If user changes volume slider while muted, automatically umute
             if (volumeLevel > 0 && this.ctx.video.muted) {
                 this.muteVideoToggle();
