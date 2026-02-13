@@ -61,13 +61,14 @@ const normalMode: PlayerMode = {
     
     // Track progress for entire video
     calculateProgressPercent: (currentTime: number, videoDuration: number) => {
+        if (!Number.isFinite(videoDuration)) return 0;
         return (currentTime / videoDuration) * 100;
     },
 
     hideSkipAdButton: (progressPercent: number) => true,
 
     hidePlayAdButton: (progressPercent: number) => {
-        return progressPercent > AD_ADVANCE_WARNING
+        return progressPercent < AD_ADVANCE_WARNING
     }
 };
 
@@ -180,9 +181,11 @@ class VideoController {
             element.addEventListener("click", onClick);
         }
 
-        // Handles progress display and visibility of the skip ad button
+        // Handles progress display and visibility of the skip ad button and play ad now button
         const skipAdBtn = document.getElementById("skip-ad-btn");
         if (!(skipAdBtn instanceof HTMLButtonElement)) return;
+        const playAdContainer = document.getElementById("play-ad-container");
+        if (!(playAdContainer instanceof HTMLDivElement)) return;
         video.addEventListener("timeupdate", () => {
             let progressPercent;
             if (this.mode.calculateProgressPercent) {
@@ -198,6 +201,10 @@ class VideoController {
 
             if (this.mode.shouldAdAppear && !this.adPlayed && progressPercent > AD_PLAYS){
                 this.switchToAdMode();
+            }
+
+            if (this.mode.hidePlayAdButton && !this.adPlayed){
+                playAdContainer.hidden = this.mode.hidePlayAdButton(progressPercent);
             }
         });
 
@@ -239,8 +246,6 @@ class VideoController {
         attachClickListener("play-ad-btn", () => this.switchToAdMode());
 
         // Handles Ad Play notification dismissal
-        const playAdContainer = document.getElementById("play-ad-container");
-        if (!(playAdContainer instanceof HTMLDivElement)) return;
         attachClickListener("play-ad-dismiss-btn", () => {
             playAdContainer.hidden = true
         });
