@@ -23,28 +23,9 @@ Add "Ad soon, play now?" notification somewhere on the screen. It should appear 
     <!-- container for custom controls -->
     <div
       id="custom-control-container"
-      class="text-white absolute -bottom-0 w-full p-3 transition-opacity duration-350 ease-in-out"
+      class="text-white absolute bottom-0 w-full p-3 transition-opacity duration-350 ease-in-out"
     >
-      <!-- Skip Button and temporary ad playing button  -->
-      <div id="play-ad-container" hidden  class="flex flex-col absolute right-5 bottom-18 max-h-15 max-w-20 pt-2 pb-2 pl-5 pr-5 text-center items-center box-content text-sm cursor-pointer rounded-lg bg-black/80 opacity-50 hover:bg-gray-800 hover:opacity-100 transition-opacity duration-500 ease-[cubic-bezier(0,0,.2,1)]">
-        <button
-          id="play-ad-dismiss-btn"
-          class="absolute top-0.5 right-1 cursor-pointer">
-          <span class="inline-block max-h-5 max-w-5">
-            <svg height="100%" viewBox="-6 -6 36 36" width="100%"
-              ><path d="M7.1,6.1L12,11l4.9-4.9l1.4,1.4L13.4,12l4.9,4.9l-1.4,1.4L12,13.4l-4.9,4.9l-1.4-1.4L10.6,12L5.7,7.5L7.1,6.1z" fill="#fff"
-              ></path></svg
-            >
-          </span>
-        </button>
-        <button
-          id="play-ad-btn"
-          class="cursor-pointer"
-          >
-          <span class="font-medium items-center">Ad Soon<br>Play Now?</span>
-        </button>
-      </div>
-      
+      <!-- Skip Button -->
       <button 
         hidden
         id="skip-ad-btn"
@@ -66,21 +47,21 @@ Add "Ad soon, play now?" notification somewhere on the screen. It should appear 
       
       <!-- Progress Bar -->
       <div class="bg-gray-200 relative w-full h-1 mb-2.5 rounded-md">
-        <!-- Ad Notification (temp pixel offset relative to ad placement) -->
-        <!-- <div id="next-ad-container" class="absolute z-[999] h-3 top-0 content-center" style="left: 50%">
-          <div id="marker" class="w-1 h-full bg-yellow-300 opacity-100"></div>
-          <div id="tooltip" class="absolute bg-[rgba(32,32,32,0.8)] text-white font-bold px-3 py-2 rounded-lg text-sm z-[9999] whitespace-nowrap transition-opacity duration-300 ease-in-out opacity-100 text-center leading-[1.3em]">
-            <div id="play-ad-btn" class="cursor-pointer">
-              <div><div>Ad soon,</div><div>play now?</div></div>
-              <div id="tooltip triangle"></div>
-            </button>
-          </div>
-        </div> -->
         <div
           id="progress-bar"
           class="absolute top-0 left-0 h-full bg-blue-400 rounded-md"
-        >
+        > 
         </div>
+        <!-- Ad Notification with hard coded placements (50% video progress) -->
+        <div id="marker" class="relative w-3 h-full bg-yellow-300" style="left: 50%">
+          <div id="tooltip" class="absolute bg-black/80 opacity-50 text-white font-bold bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded-lg text-sm z-9999 whitespace-nowrap text-center leading-[1.3em]">
+            <div id="ad-panel" class="relative">
+              <div><div>Ad Will</div><div>Play Here</div></div>
+              <div id="tooltip-triangle" class="absolute w-0 h-0 border-l-10 border-l-transparent border-r-10 border-r-transparent border-t-10 border-t-black/80 left-1/2 -translate-x-1/2 -bottom-4.5"></div>
+            </div>
+          </div>
+        </div>
+        
         <input
           id="scrubber"
           type="range"
@@ -122,6 +103,28 @@ Add "Ad soon, play now?" notification somewhere on the screen. It should appear 
         </button>
       </div>
       <script type="module" src="src/scripts/video_player.ts"></script>
+    </div>
+
+    <!-- Play Ad Button (Seperated for auto hiding purposes) -->
+    <div id="play-ad-container" class="absolute bottom-0 w-full p-3 text-white" hidden>
+      <div id="play-ad-container"  class="flex flex-col absolute right-5 bottom-18 max-h-15 max-w-20 pt-2 pb-2 pl-5 pr-5 text-center items-center box-content text-sm cursor-pointer rounded-lg bg-black/80 opacity-50 hover:bg-gray-800 hover:opacity-100 transition-opacity duration-500 ease-[cubic-bezier(0,0,.2,1)]">
+        <button
+          id="play-ad-dismiss-btn"
+          class="absolute top-0.5 right-1 cursor-pointer">
+          <span class="inline-block max-h-5 max-w-5">
+            <svg height="100%" viewBox="-6 -6 36 36" width="100%"
+              ><path d="M7.1,6.1L12,11l4.9-4.9l1.4,1.4L13.4,12l4.9,4.9l-1.4,1.4L12,13.4l-4.9,4.9l-1.4-1.4L10.6,12L5.7,7.5L7.1,6.1z" fill="#fff"
+              ></path></svg
+            >
+          </span>
+        </button>
+        <button
+          id="play-ad-btn"
+          class="cursor-pointer"
+          >
+          <span class="font-medium items-center">Ad Soon<br>Play Now?</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>

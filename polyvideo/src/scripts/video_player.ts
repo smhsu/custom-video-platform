@@ -4,15 +4,15 @@ import volumeOn from "../assets/images/volume_on.svg"
 import volumeOff from "../assets/images/volume_off.svg"
 import volumeMute from "../assets/images/volume_mute.svg"
 
-const AD_ADVANCE_WARNING = 30 // Percent into video when first warning appears
+const AD_ADVANCE_WARNING = 30 // Percent into video when first warning appears and panel warning 
 const AD_PLAYS = 50 // Percent into the video when ad plays
 
 /**
  * MVP features
  * Dismissable ad soon button -/
- * Tick mark and small panel that explains it
+ * Tick mark and small panel that explains it -/
  * Auto-hiding controls -/
- * Goes back to play the video when ad finishes
+ * Goes back to play the video when ad finishes 
  * There is a telemetry system in place (requires backend)
  *      Set up database...
  *      Set up backend API...
@@ -198,7 +198,7 @@ class VideoController {
 
     initPlayerControls() {
         // Grab all needed HTML elements from context
-        const { video, progressBar, scrubber } = this.ctx;
+        const { video, progressBar, scrubber, customControlContainer } = this.ctx;
 
         // Initialize volume icon
         this.updateVolumeIcon();
@@ -215,6 +215,8 @@ class VideoController {
         if (!(skipAdBtn instanceof HTMLButtonElement)) return;
         const playAdContainer = document.getElementById("play-ad-container");
         if (!(playAdContainer instanceof HTMLDivElement)) return;
+        const marker = document.getElementById("marker");
+        if (!(marker instanceof HTMLDivElement)) return;
         video.addEventListener("timeupdate", () => {
             let progressPercent;
             if (this.mode.calculateProgressPercent) {
@@ -224,15 +226,22 @@ class VideoController {
             }
             progressBar.style.width = progressPercent + "%";
 
+            // Skip button visibility
             if (this.mode.hideSkipAdButton) {
                 skipAdBtn.hidden = this.mode.hideSkipAdButton(progressPercent);
             }
 
-            // Tracking progress with videoController instead
+            // Ad tick mark visibility (may just hide on mode switch)
+            if (this.adPlayed) {
+                marker.hidden = true;
+            }
+
+            // Ad mode switch progress switch
             if (this.mode.shouldAdAppear && !this.adPlayed && progressPercent > AD_PLAYS) {
                 this.switchToAdMode();
             }
 
+            // Play ad button visibility
             if (this.mode.hidePlayAdButton && !this.playAdBtnDissmissed) {
                 playAdContainer.hidden = this.adPlayed ? true : this.mode.hidePlayAdButton(progressPercent);
             }
@@ -292,7 +301,7 @@ class VideoController {
         video.addEventListener("loadedmetadata", () => {
             const displayedDuration = document.getElementById("full-video-duration");
             if (!(displayedDuration instanceof HTMLSpanElement)) return;
-            displayedDuration.textContent = this.formatDuration(this.ctx.video.duration);
+            displayedDuration.textContent = this.formatDuration(video.duration);
         });
 
         // Handles muting video
@@ -303,10 +312,10 @@ class VideoController {
         if (!(volumeSlider instanceof HTMLInputElement)) return;
         volumeSlider.addEventListener("input", () => {
             const volumeLevel = parseInt(volumeSlider.value);
-            this.ctx.video.volume = volumeLevel / 100;
+            video.volume = volumeLevel / 100;
 
             // If user changes volume slider while muted, automatically umute
-            if (volumeLevel > 0 && this.ctx.video.muted) {
+            if (volumeLevel > 0 && video.muted) {
                 this.muteVideoToggle();
             }
             this.updateVolumeIcon();
