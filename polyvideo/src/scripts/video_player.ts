@@ -12,7 +12,7 @@ const AD_PLAYS = 50 // Percent into the video when ad plays
  * Dismissable ad soon button -/
  * Tick mark and small panel that explains it -/
  * Auto-hiding controls -/
- * Goes back to play the video when ad finishes 
+ * Goes back to play the video when ad finishes (autoskip when ad ends)
  * There is a telemetry system in place (requires backend)
  *      Set up database...
  *      Set up backend API...
@@ -24,7 +24,6 @@ const AD_PLAYS = 50 // Percent into the video when ad plays
  * Polish styles cross-platform
  * Video scrubber mouse clicks are not completely precise
  * Change profile icons
- * Autoskip when ad ends
  */
 
 // A package of relevant HTML elements
@@ -200,6 +199,21 @@ class VideoController {
         // Grab all needed HTML elements from context
         const { video, progressBar, scrubber, customControlContainer } = this.ctx;
 
+        // Document queries for relevant HTML elements
+        const skipAdBtn = document.getElementById("skip-ad-btn");
+        const playAdContainer = document.getElementById("play-ad-container");
+        const marker = document.getElementById("marker");
+        const videoContainer = document.getElementById("video-container");
+        const displayedTime = document.getElementById("current-video-time");
+        const volumeSlider = document.getElementById("volume-slider");
+        
+        if (!(skipAdBtn instanceof HTMLButtonElement)) return;
+        if (!(playAdContainer instanceof HTMLDivElement)) return;
+        if (!(marker instanceof HTMLDivElement)) return;
+        if (!(videoContainer instanceof HTMLDivElement)) return;
+        if (!(displayedTime instanceof HTMLSpanElement)) return;
+        if (!(volumeSlider instanceof HTMLInputElement)) return;
+
         // Initialize volume icon
         this.updateVolumeIcon();
 
@@ -211,12 +225,6 @@ class VideoController {
         }
 
         // Handles progress display and visibility of the skip ad button and play ad now button
-        const skipAdBtn = document.getElementById("skip-ad-btn");
-        if (!(skipAdBtn instanceof HTMLButtonElement)) return;
-        const playAdContainer = document.getElementById("play-ad-container");
-        if (!(playAdContainer instanceof HTMLDivElement)) return;
-        const marker = document.getElementById("marker");
-        if (!(marker instanceof HTMLDivElement)) return;
         video.addEventListener("timeupdate", () => {
             let progressPercent;
             if (this.mode.calculateProgressPercent) {
@@ -268,8 +276,6 @@ class VideoController {
 
         // Handles video fullscreen
         // Request fullscreen on div (not video) to not have the default fullscreen UI
-        const videoContainer = document.getElementById("video-container");
-        if (!(videoContainer instanceof HTMLDivElement)) return;
         attachClickListener("fullscreen-btn", () => {
             if (document.fullscreenElement !== videoContainer) {
                 videoContainer.requestFullscreen();
@@ -291,8 +297,6 @@ class VideoController {
         });
 
         // Handles current time display
-        const displayedTime = document.getElementById("current-video-time");
-        if (!(displayedTime instanceof HTMLSpanElement)) return;
         video.addEventListener("timeupdate", () => {
             displayedTime.textContent = this.formatDuration(video.currentTime);
         });
@@ -308,8 +312,6 @@ class VideoController {
         attachClickListener("mute-btn", () => this.muteVideoToggle());
 
         // Handles user request to change volume using the slider
-        const volumeSlider = document.getElementById("volume-slider");
-        if (!(volumeSlider instanceof HTMLInputElement)) return;
         volumeSlider.addEventListener("input", () => {
             const volumeLevel = parseInt(volumeSlider.value);
             video.volume = volumeLevel / 100;
