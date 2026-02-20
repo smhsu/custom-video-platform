@@ -9,9 +9,9 @@ const AD_PLAYS = 50 // Percent into the video when ad plays
 
 /**
  * MVP features
- * Dismissable ad soon button
+ * Dismissable ad soon button -/
  * Tick mark and small panel that explains it
- * Auto-hiding controls
+ * Auto-hiding controls -/
  * Goes back to play the video when ad finishes
  * There is a telemetry system in place (requires backend)
  *      Set up database...
@@ -32,6 +32,7 @@ interface Context {
     video: HTMLVideoElement;
     progressBar: HTMLDivElement;
     scrubber: HTMLInputElement;
+    customControlContainer: HTMLDivElement;
 }
 
 // Acts as the composite of mode specific behavior/functionality
@@ -74,7 +75,7 @@ const normalMode: PlayerMode = {
 
     // Should check for this (and the skip button be here or moved to videoController also?)
     hidePlayAdButton: (progressPercent: number) => {
-        return progressPercent < AD_ADVANCE_WARNING
+        return progressPercent < AD_ADVANCE_WARNING;
     }
 };
 
@@ -105,7 +106,9 @@ class VideoController {
     private normalModeResumptionTime: number = 0;
     // Flag to track if viewer has watched an ad (only checks one ad)
     private adPlayed: boolean;
-    // private autoHideTimeout: ReturnType<typeof setTimeout>;
+    // Flag to track if play ad button has been dismissed (will be eventually be in a new "PlayAdControl" class)
+    private playAdBtnDissmissed: boolean
+    private autoHideTimeout: ReturnType<typeof setTimeout> | null = null;
 
     constructor(ctx: Context, initialMode: PlayerMode) {
         this.ctx = ctx;
@@ -113,8 +116,10 @@ class VideoController {
         this.switchMode(initialMode);
         this.initPlayerControls();
         this.adPlayed = false;
+        this.playAdBtnDissmissed = false;
     }
 
+    // Clear timeout on mode switches
     private switchMode(newMode: PlayerMode) {
         this.ctx.progressBar.classList.remove(this.mode.progressBarCssClass);
         this.mode = newMode;
@@ -128,6 +133,7 @@ class VideoController {
         this.switchMode(adMode);
         this.ctx.video.currentTime = 0;
         this.playVideo();
+        this.showControls();
     }
 
     switchToNormalMode() {
@@ -173,6 +179,23 @@ class VideoController {
         this.updateVolumeIcon();
     }
 
+    showControls() {
+        this.ctx.customControlContainer.classList.remove("opacity-0");
+        this.ctx.customControlContainer.classList.add("opacity-100");
+    }
+
+    hideControls() {
+        this.ctx.customControlContainer.classList.remove("opacity-100");
+        this.ctx.customControlContainer.classList.add("opacity-0");
+    }
+
+    clearAutoHideTimeout() {
+        if (this.autoHideTimeout) {
+            clearTimeout(this.autoHideTimeout);
+            this.autoHideTimeout = null;
+        }
+    }
+
     initPlayerControls() {
         // Grab all needed HTML elements from context
         const { video, progressBar, scrubber } = this.ctx;
@@ -210,7 +233,7 @@ class VideoController {
                 this.switchToAdMode();
             }
 
-            if (this.mode.hidePlayAdButton) {
+            if (this.mode.hidePlayAdButton && !this.playAdBtnDissmissed) {
                 playAdContainer.hidden = this.adPlayed ? true : this.mode.hidePlayAdButton(progressPercent);
             }
         });
@@ -254,7 +277,8 @@ class VideoController {
 
         // Handles Ad Play notification dismissal
         attachClickListener("play-ad-dismiss-btn", () => {
-            playAdContainer.hidden = true
+            playAdContainer.hidden = true;
+            this.playAdBtnDissmissed = true;
         });
 
         // Handles current time display
@@ -289,19 +313,23 @@ class VideoController {
         });
 
         // Handles auto hiding video controls
-        // const videoContainer = document.getElementById("video-container");
-        // const controls = document.getElementById("custom-control-container");
+        videoContainer.addEventListener("mousemove", () => {
+            // Reset timer for hiding
+            this.clearAutoHideTimeout();
 
-        // if (!(videoContainer instanceof HTMLDivElement && controls instanceof HTMLDivElement)) return;
+            this.showControls()
 
-        // // Use timeout id
-        // videoContainer.addEventListener("mousemove", () => {
-        //     this.mode.handleShowControls(this.ctx);
-        // })
+            this.autoHideTimeout = setTimeout(() => {
+                if (!this.mode.isAutoHideControlsEnabled) return;
+                this.hideControls();
+            }, 2500) // In ms, so 2.5 seconds then executes 
+        });
 
-        // videoContainer.addEventListener("mouseleave", () => {
-        //     this.mode.handleHideControls(this.ctx);
-        // })
+        videoContainer.addEventListener("mouseleave", () => {
+            if (this.mode.isAutoHideControlsEnabled) {
+                this.hideControls();
+            }
+        });
     }
 
     /**
@@ -323,15 +351,18 @@ function init() {
     const video = document.getElementById("media-video");
     const progressBar = document.getElementById("progress-bar");
     const scrubber = document.getElementById("scrubber");
+    const customControlContainer = document.getElementById("custom-control-container");
 
     if (!(video instanceof HTMLVideoElement)) return;
     if (!(progressBar instanceof HTMLDivElement)) return;
     if (!(scrubber instanceof HTMLInputElement)) return;
+    if (!(customControlContainer instanceof HTMLDivElement)) return;
 
     const ctx: Context = {
         video,
         progressBar,
         scrubber,
+        customControlContainer
     };
 
     normalMode.videoSrc = video.currentSrc;
