@@ -4,6 +4,9 @@ import volumeOn from "../assets/images/volume_on.svg"
 import volumeOff from "../assets/images/volume_off.svg"
 import volumeMute from "../assets/images/volume_mute.svg"
 
+// Class responsible for all Ad notifications
+import { NotificationController } from "./notification_controller"
+
 const AD_ADVANCE_WARNING = 30 // Percent into video when first warning appears and panel warning 
 const AD_PLAYS = 50 // Percent into the video when ad plays
 
@@ -32,6 +35,11 @@ interface Context {
     progressBar: HTMLDivElement;
     scrubber: HTMLInputElement;
     customControlContainer: HTMLDivElement;
+}
+// A package of relevant
+interface NotificationContext {
+    playAdContainer: HTMLDivElement;
+    marker: HTMLDivElement;
 }
 
 // Acts as the composite of mode specific behavior/functionality
@@ -108,6 +116,7 @@ class VideoController {
     // Flag to track if play ad button has been dismissed (will be eventually be in a new "PlayAdControl" class)
     private playAdBtnDissmissed: boolean
     private autoHideTimeout: ReturnType<typeof setTimeout> | null = null;
+
 
     constructor(ctx: Context, initialMode: PlayerMode) {
         this.ctx = ctx;
@@ -214,6 +223,9 @@ class VideoController {
         if (!(displayedTime instanceof HTMLSpanElement)) return;
         if (!(volumeSlider instanceof HTMLInputElement)) return;
 
+        const n_ctx = {playAdContainer, marker};
+        const notifications = new NotificationController(n_ctx);
+
         // Initialize volume icon
         this.updateVolumeIcon();
 
@@ -294,6 +306,8 @@ class VideoController {
         attachClickListener("play-ad-dismiss-btn", () => {
             playAdContainer.hidden = true;
             this.playAdBtnDissmissed = true;
+
+            notifications.play_ad_hide()
         });
 
         // Handles current time display
