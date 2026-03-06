@@ -17,9 +17,8 @@ const AD_PLAYS = 50 // Percent into the video when ad plays
  * Auto-hiding controls -/
  * Goes back to play the video when ad finishes (autoskip when ad ends) -/ 
  * Render a video player that doesn't have all of the ad soon play now features based on url parameters
- *       Rename modes, and introduce that third mode OR PUBSUB ?
- *       JK do third mode
- *          ex: should ad soon notifcation appear on modes 
+ *       Introduce a third mode
+ *          ex: should ad soon notifcation appear on one mode 
  * Make tick mark darker -/
  * cancel dismiss be a circular overlay on top -/
  * Cleanup and Rename method stubs
@@ -56,6 +55,7 @@ interface PlayerMode {
     canSeek: boolean;
     isAutoHideControlsEnabled: boolean;
     shouldAdAppear: boolean;
+    isAutoSkipAdEnabled: boolean;
 
     // CSS class to apply to the video playback progress bar
     progressBarCssClass: string;
@@ -77,6 +77,8 @@ const normalMode: PlayerMode = {
     canSeek: true,
     isAutoHideControlsEnabled: true, // Not implemented yet in PlayerController
     shouldAdAppear: true, // Currently plays ad 50% through the video
+    isAutoSkipAdEnabled: false,
+
     progressBarCssClass: "bg-blue-400",
 
     // Track progress for entire video
@@ -99,6 +101,8 @@ const adMode: PlayerMode = {
     canSeek: false,
     isAutoHideControlsEnabled: false, // Not implemented yet in PlayerController
     shouldAdAppear: false,
+    isAutoSkipAdEnabled: true,
+
     progressBarCssClass: "bg-yellow-300",
 
     // Tracks first 5 seconds of ad
@@ -258,7 +262,7 @@ class VideoController {
                 skipAdBtn.hidden = this.mode.hideSkipAdButton(progressPercent);
             }
 
-            // Ad tick mark visibility (may just hide on mode switch)
+            // Ad tick mark visibility (may just hide on mode switch once refactored to notif controller)
             if (this.adPlayed) {
                 marker.hidden = true;
             }
@@ -274,6 +278,14 @@ class VideoController {
             }
         });
 
+        // Handles behavior once a video ends
+        video.addEventListener("ended", () => {
+            // Autoskip once ad finishes
+            if (this.mode.isAutoSkipAdEnabled) {
+                this.switchToNormalMode();
+            }
+        });
+            
         // Handles timeline clicks, i.e. user requests to seek.
         scrubber.addEventListener("input", () => {
             if (!this.mode.canSeek) return;
