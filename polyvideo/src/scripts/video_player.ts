@@ -15,7 +15,14 @@ const AD_PLAYS = 50 // Percent into the video when ad plays
  * Dismissable ad soon button -/
  * Tick mark and small panel that explains it -/
  * Auto-hiding controls -/
- * Goes back to play the video when ad finishes (autoskip when ad ends)
+ * Goes back to play the video when ad finishes (autoskip when ad ends) -/ 
+ * Render a video player that doesn't have all of the ad soon play now features based on url parameters
+ *       Rename modes, and introduce that third mode OR PUBSUB ?
+ *       JK do third mode
+ *          ex: should ad soon notifcation appear on modes 
+ * Make tick mark darker -/
+ * cancel dismiss be a circular overlay on top -/
+ * Cleanup and Rename method stubs
  * There is a telemetry system in place (requires backend)
  *      Set up database...
  *      Set up backend API...

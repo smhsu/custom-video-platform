@@ -4,7 +4,6 @@ interface Context {
     marker: HTMLDivElement;
 }
 
-
 export class NotificationController {
     private dismissed: boolean;
     private hidden: boolean;
