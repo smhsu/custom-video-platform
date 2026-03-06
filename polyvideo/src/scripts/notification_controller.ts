@@ -1,46 +1,62 @@
-// Package of relevant HTML elements
-interface Context {
-    playAdContainer: HTMLDivElement;
-    marker: HTMLDivElement;
-}
-
 export class NotificationController {
     private dismissed: boolean;
     private hidden: boolean;
     private autoHideTimeout: ReturnType<typeof setTimeout> | null = null;
-    private ctx: Context
+    private adPlayed: boolean;
+    private marker!: HTMLDivElement;
+    private playAdContainer!: HTMLDivElement;
 
-    constructor(ctx: Context) {
-        this.ctx = ctx
+    // Removed context as the Controller will document query here
+    constructor() {
+        this.initNotificationControls();
         this.dismissed = false;
         this.hidden = true;
+        this.adPlayed = false;
+    }
+
+    initNotificationControls() {
+        const playAdContainer = document.getElementById("play-ad-container");
+        const marker = document.getElementById("marker");
+
+        if (!(playAdContainer instanceof HTMLDivElement)) return;
+        if (!(marker instanceof HTMLDivElement)) return;
+
+        this.playAdContainer = playAdContainer;
+        this.marker = marker;
     }
 
     // Dynamically set market and Ad placement(currently hardcoded at 50%)
     setMarkerAtPercent(percent: number){
-        this.ctx.marker.style.left = `${percent}%`;
+        this.marker.style.left = `${percent}%`;
     }
 
     // Marker showing and hiding are bound to the autohide timing
-    marker_show() {
-        console.log("show");
+    showMarker() {
+        this.marker.hidden = false;
     }
 
-    marker_hide() {
-        console.log("hide");
+    hideMarker() {
+        this.marker.hidden = true;
     }
 
-    // play 
-    play_ad_show() {
-
+    showPlayAdBtn() {
+        this.playAdContainer.hidden = false;
     }
 
-    play_ad_hide() {
-
+    hidePlayAdBtn() {
+        this.playAdContainer.hidden = true;
+        this.dismissed = true;
     }
 
     reset() {
-        console.log("reset")
+        console.log("reset");
+    }
+
+    // Called on video timeupdate
+    // Responsible for marker + play-ad-btn visibility based on progress
+    update(progressPercent: number, shouldAdAppear: boolean, hidePlayAdButton: (prog: number) => boolean){
+        if (this.adPlayed = true) return;
+
     }
 }
 

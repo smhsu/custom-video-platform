@@ -42,11 +42,6 @@ interface Context {
     scrubber: HTMLInputElement;
     customControlContainer: HTMLDivElement;
 }
-// A package of relevant
-interface NotificationContext {
-    playAdContainer: HTMLDivElement;
-    marker: HTMLDivElement;
-}
 
 // Acts as the composite of mode specific behavior/functionality
 // Functionality that's shared between modes (pause play, fullscreen, etc.) are set when declaring event listeners
@@ -221,21 +216,21 @@ class VideoController {
 
         // Document queries for relevant HTML elements
         const skipAdBtn = document.getElementById("skip-ad-btn");
-        const playAdContainer = document.getElementById("play-ad-container");
-        const marker = document.getElementById("marker");
+        // const playAdContainer = document.getElementById("play-ad-container");
+        // const marker = document.getElementById("marker");
         const videoContainer = document.getElementById("video-container");
         const displayedTime = document.getElementById("current-video-time");
         const volumeSlider = document.getElementById("volume-slider");
         
         if (!(skipAdBtn instanceof HTMLButtonElement)) return;
-        if (!(playAdContainer instanceof HTMLDivElement)) return;
-        if (!(marker instanceof HTMLDivElement)) return;
+        // if (!(playAdContainer instanceof HTMLDivElement)) return;
+        // if (!(marker instanceof HTMLDivElement)) return;
         if (!(videoContainer instanceof HTMLDivElement)) return;
         if (!(displayedTime instanceof HTMLSpanElement)) return;
         if (!(volumeSlider instanceof HTMLInputElement)) return;
 
-        const n_ctx = {playAdContainer, marker};
-        const notifications = new NotificationController(n_ctx);
+        // Initialize notification class
+        const notifications = new NotificationController();
 
         // Initialize volume icon
         this.updateVolumeIcon();
@@ -273,9 +268,12 @@ class VideoController {
             }
 
             // Play ad button visibility
-            if (this.mode.hidePlayAdButton && !this.playAdBtnDissmissed) {
-                playAdContainer.hidden = this.adPlayed ? true : this.mode.hidePlayAdButton(progressPercent);
-            }
+            // if (this.mode.hidePlayAdButton && !this.playAdBtnDissmissed) {
+            //     playAdContainer.hidden = this.adPlayed ? true : this.mode.hidePlayAdButton(progressPercent);
+            // }
+            
+            // Instead, pass in progress to NotificationController and controller handles all visivility
+            notifications.update(progressPercent, this.mode.shouldAdAppear, this.mode.hidePlayAdButton);
         });
 
         // Handles behavior once a video ends
@@ -322,12 +320,7 @@ class VideoController {
         attachClickListener("play-ad-btn", () => this.switchToAdMode());
 
         // Handles Ad Play notification dismissal
-        attachClickListener("play-ad-dismiss-btn", () => {
-            playAdContainer.hidden = true;
-            this.playAdBtnDissmissed = true;
-
-            notifications.play_ad_hide()
-        });
+        attachClickListener("play-ad-dismiss-btn", () => notifications.hidePlayAdBtn());
 
         // Handles current time display
         video.addEventListener("timeupdate", () => {
