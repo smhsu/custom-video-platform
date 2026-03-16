@@ -8,16 +8,15 @@ import volumeMute from "../assets/images/volume_mute.svg"
 import { NotificationController } from "./notification_controller"
 
 import type { Context, PlayerMode } from "./types"
-
-const AD_ADVANCE_WARNING = 30 // Percent into video when first warning appears and panel warning 
-const AD_PLAYS = 50 // Percent into the video when ad plays
+import { AD_ADVANCE_WARNING, AD_PLAYS } from "./types"
 
 /**
  * MVP features
  * Render a video player that doesn't have all of the ad soon play now features based on url parameters
  *       Introduce a third mode
  *          ex: should ad soon notifcation appear on one mode 
- * Implement notifiation controller refactor
+ * Implement notifiation controller refactor (should skip-ad-btn functionality be added?) -/
+ * Bug: Autohide doesn't retrigger when switching back to normal mode
  * Seperate Modes to their own file
  * There is a telemetry system in place (requires backend)
  *      Set up database...
@@ -273,7 +272,7 @@ class VideoController {
         // Handles Skip Ad button, disappears when in main mode
         attachClickListener("skip-ad-btn", () => this.switchToNormalMode(notifications));
 
-        // Handles Ad Play button (temporary), should disappear when in ad mode
+        // Handles Ad Play button, should disappear when in ad mode
         attachClickListener("play-ad-btn", () => this.switchToAdMode(notifications));
 
         // Handles Ad Play notification dismissal

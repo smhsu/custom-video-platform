@@ -1,6 +1,9 @@
 // As controllers and modes (once seperates by file) share interfaces
 // I move them into their own file and import as needed
 
+export const AD_ADVANCE_WARNING = 30 // Percent into video when first warning appears and panel warning 
+export const AD_PLAYS = 50 // Percent into the video when ad plays
+
 // A package of relevant HTML elements
 export interface Context {
     video: HTMLVideoElement;

@@ -5,6 +5,7 @@ export class NotificationController {
     private mode: PlayerMode
     private dismissed: boolean;
     private adPlayed: boolean;
+    private shown: boolean;
     private marker!: HTMLDivElement;
     private playAdContainer!: HTMLDivElement;
 
@@ -13,6 +14,7 @@ export class NotificationController {
         this.initNotificationControls();
         this.mode = initalMode
         this.dismissed = false;
+        this.shown = false
         this.adPlayed = false;
     }
 
@@ -51,17 +53,20 @@ export class NotificationController {
 
     // Called on video timeupdate
     // Responsible for marker + play-ad-btn visibility based on progress
-    // Mode responsible ifAdShouldPlay instead of passing in
     handleTimeUpdate(progressPercent: number){
         if (this.adPlayed) return;
 
-        // Mode or Dissmissal determines visibility
+         // Flag once play-ad-btn is shown, shouldn't rehide if user rewinds
+        if (!this.mode.hidePlayAdButton(progressPercent)) {
+            this.shown = true
+        }
+
+        // Either Mode or Dissmissal determines visibility
         let shouldHide = !this.mode.shouldAdAppear 
             || this.dismissed 
-            || this.mode.hidePlayAdButton(progressPercent);
+            || !this.shown;
 
         this.playAdContainer.hidden = shouldHide;
-
     }
 }
 
