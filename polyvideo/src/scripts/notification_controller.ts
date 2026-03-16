@@ -1,32 +1,5 @@
 // I have the context, but I use nothing from the context...
-interface Context {
-        video: HTMLVideoElement;
-        progressBar: HTMLDivElement;
-        scrubber: HTMLInputElement;
-        customControlContainer: HTMLDivElement;
-    }
-
-// Functionality that's shared between modes (pause play, fullscreen, etc.) are set when declaring event listeners
-interface PlayerMode {
-    videoSrc: string;
-    canSeek: boolean;
-    isAutoHideControlsEnabled: boolean;
-    shouldAdAppear: boolean;
-    isAutoSkipAdEnabled: boolean;
-
-    // CSS class to apply to the video playback progress bar
-    progressBarCssClass: string;
-
-    /**
-     * Computes the current progress of video playback in terms of a percentage (output is between 0 and 100), which
-     * will be visualized for the end user.
-     */
-    calculateProgressPercent(currentTime: number, videoDuration: number): number;
-
-    hideSkipAdButton(progressPercent: number): boolean;
-
-    hidePlayAdButton(progressPercent: number): boolean;
-}
+import type { Context, PlayerMode } from "./types";
 
 export class NotificationController {
     private mode: PlayerMode
