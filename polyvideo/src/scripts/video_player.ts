@@ -12,16 +12,11 @@ const AD_PLAYS = 50 // Percent into the video when ad plays
 
 /**
  * MVP features
- * Dismissable ad soon button -/
- * Tick mark and small panel that explains it -/
- * Auto-hiding controls -/
- * Goes back to play the video when ad finishes (autoskip when ad ends) -/ 
  * Render a video player that doesn't have all of the ad soon play now features based on url parameters
  *       Introduce a third mode
  *          ex: should ad soon notifcation appear on one mode 
- * Make tick mark darker -/
- * cancel dismiss be a circular overlay on top -/
- * Cleanup and Rename method stubs
+ * Implement notifiation controller refactor
+ * Seperate Modes to their own file
  * There is a telemetry system in place (requires backend)
  *      Set up database...
  *      Set up backend API...
@@ -141,19 +136,24 @@ class VideoController {
         this.ctx.video.src = this.mode.videoSrc;
     }
 
-    switchToAdMode() {
+    switchToAdMode(notifications: NotificationController) {
         this.adPlayed = true;
         this.normalModeResumptionTime = this.ctx.video.currentTime;
         this.switchMode(adMode);
         this.ctx.video.currentTime = 0;
         this.playVideo();
         this.showControls();
+        // Sync with NotificationController
+        notifications.switchMode(adMode);
+        notifications.onAdStarted();
     }
 
-    switchToNormalMode() {
+    switchToNormalMode(notifications: NotificationController) {
         this.switchMode(normalMode);
         this.ctx.video.currentTime = this.normalModeResumptionTime;
         this.playVideo();
+        // Sync with NotificationController
+        notifications.switchMode(normalMode);
     }
 
     private setPlayPauseIcon(src: string) {
@@ -216,22 +216,18 @@ class VideoController {
 
         // Document queries for relevant HTML elements
         const skipAdBtn = document.getElementById("skip-ad-btn");
-        // const playAdContainer = document.getElementById("play-ad-container");
-        // const marker = document.getElementById("marker");
         const videoContainer = document.getElementById("video-container");
         const displayedTime = document.getElementById("current-video-time");
         const volumeSlider = document.getElementById("volume-slider");
         
         if (!(skipAdBtn instanceof HTMLButtonElement)) return;
-        // if (!(playAdContainer instanceof HTMLDivElement)) return;
-        // if (!(marker instanceof HTMLDivElement)) return;
         if (!(videoContainer instanceof HTMLDivElement)) return;
         if (!(displayedTime instanceof HTMLSpanElement)) return;
         if (!(volumeSlider instanceof HTMLInputElement)) return;
 
         // Initialize notification class
-        const notifications = new NotificationController();
-
+        const notifications = new NotificationController(this.ctx, this.mode);
+    
         // Initialize volume icon
         this.updateVolumeIcon();
 
@@ -257,30 +253,20 @@ class VideoController {
                 skipAdBtn.hidden = this.mode.hideSkipAdButton(progressPercent);
             }
 
-            // Ad tick mark visibility (may just hide on mode switch once refactored to notif controller)
-            if (this.adPlayed) {
-                marker.hidden = true;
-            }
-
             // Ad mode switch progress switch
             if (this.mode.shouldAdAppear && !this.adPlayed && progressPercent > AD_PLAYS) {
-                this.switchToAdMode();
+                this.switchToAdMode(notifications);
             }
-
-            // Play ad button visibility
-            // if (this.mode.hidePlayAdButton && !this.playAdBtnDissmissed) {
-            //     playAdContainer.hidden = this.adPlayed ? true : this.mode.hidePlayAdButton(progressPercent);
-            // }
             
             // Instead, pass in progress to NotificationController and controller handles all visivility
-            notifications.update(progressPercent, this.mode.shouldAdAppear, this.mode.hidePlayAdButton);
+            notifications.handleTimeUpdate(progressPercent);
         });
 
         // Handles behavior once a video ends
         video.addEventListener("ended", () => {
             // Autoskip once ad finishes
             if (this.mode.isAutoSkipAdEnabled) {
-                this.switchToNormalMode();
+                this.switchToNormalMode(notifications);
             }
         });
             
@@ -314,10 +300,10 @@ class VideoController {
         });
 
         // Handles Skip Ad button, disappears when in main mode
-        attachClickListener("skip-ad-btn", () => this.switchToNormalMode());
+        attachClickListener("skip-ad-btn", () => this.switchToNormalMode(notifications));
 
         // Handles Ad Play button (temporary), should disappear when in ad mode
-        attachClickListener("play-ad-btn", () => this.switchToAdMode());
+        attachClickListener("play-ad-btn", () => this.switchToAdMode(notifications));
 
         // Handles Ad Play notification dismissal
         attachClickListener("play-ad-dismiss-btn", () => notifications.hidePlayAdBtn());
