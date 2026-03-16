@@ -18,6 +18,10 @@ export class NotificationController {
         this.adPlayed = false;
     }
 
+    setAdRequestedListener(callback) {
+
+    }
+
     // Keep VideoController mode in sync
     switchMode(newMode: PlayerMode) {
         this.mode = newMode
@@ -51,14 +55,24 @@ export class NotificationController {
         this.dismissed = true;
     }
 
+    showAdSoonNotification() {
+        if (this.dismissed) {
+            return;
+        }
+    }
+
+    hideAdSoonNotification() {
+        this.dismissed = true;
+    }
+
     // Called on video timeupdate
     // Responsible for marker + play-ad-btn visibility based on progress
     handleTimeUpdate(progressPercent: number){
         if (this.adPlayed) return;
 
          // Flag once play-ad-btn is shown, shouldn't rehide if user rewinds
-        if (!this.mode.hidePlayAdButton(progressPercent)) {
-            this.shown = true
+        if (this.mode.hidePlayAdButton(progressPercent)) {
+            this.showAdSoonNotification();
         }
 
         // Either Mode or Dissmissal determines visibility
