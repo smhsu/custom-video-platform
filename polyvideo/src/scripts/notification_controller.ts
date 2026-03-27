@@ -3,9 +3,9 @@ import type { Context, PlayerMode } from "./types";
 
 export class NotificationController {
     private mode: PlayerMode
-    private dismissed: boolean;
-    private adPlayed: boolean;
-    private shown: boolean;
+    private hasBeenDismissed: boolean;
+    private hasAdPlayed: boolean;
+    private hasBeenShown: boolean;
     private marker!: HTMLDivElement;
     private playAdContainer!: HTMLDivElement;
 
@@ -13,9 +13,9 @@ export class NotificationController {
     constructor(ctx: Context, initalMode: PlayerMode) {
         this.initNotificationControls();
         this.mode = initalMode
-        this.dismissed = false;
-        this.shown = false
-        this.adPlayed = false;
+        this.hasBeenDismissed = false;
+        this.hasBeenShown = false
+        this.hasAdPlayed = false;
     }
 
     // Keep VideoController mode in sync
@@ -36,7 +36,7 @@ export class NotificationController {
 
     // Hide controls when ad triggers
     onAdStarted() {
-        this.adPlayed = true;
+        this.hasAdPlayed = true;
         this.playAdContainer.hidden = true
         this.marker.hidden = true
     }
@@ -48,23 +48,23 @@ export class NotificationController {
 
     hidePlayAdBtn() {
         this.playAdContainer.hidden = true;
-        this.dismissed = true;
+        this.hasBeenDismissed = true;
     }
 
     // Called on video timeupdate
     // Responsible for marker + play-ad-btn visibility based on progress
     handleTimeUpdate(progressPercent: number){
-        if (this.adPlayed) return;
+        if (this.hasAdPlayed) return;
 
          // Flag once play-ad-btn is shown, shouldn't rehide if user rewinds
         if (!this.mode.hidePlayAdButton(progressPercent)) {
-            this.shown = true
+            this.hasBeenShown = true
         }
 
         // Either Mode or Dissmissal determines visibility
         let shouldHide = !this.mode.shouldAdAppear 
-            || this.dismissed 
-            || !this.shown;
+            || this.hasBeenDismissed 
+            || !this.hasBeenShown;
 
         this.playAdContainer.hidden = shouldHide;
     }
