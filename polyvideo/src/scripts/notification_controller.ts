@@ -18,12 +18,8 @@ export class NotificationController {
         this.hasAdPlayed = false;
     }
 
-    setAdRequestedListener(callback) {
-
-    }
-
-    setAdRequestedListener(callback) {
-
+    setAdRequestedListener(callback: string) {
+        console.log(callback);
     }
 
     // Keep VideoController mode in sync
@@ -60,23 +56,13 @@ export class NotificationController {
     }
 
     showAdSoonNotification() {
-        if (this.dismissed) {
+        if (this.hasBeenDismissed) {
             return;
         }
     }
 
     hideAdSoonNotification() {
-        this.dismissed = true;
-    }
-
-    showAdSoonNotification() {
-        if (this.dismissed) {
-            return;
-        }
-    }
-
-    hideAdSoonNotification() {
-        this.dismissed = true;
+        this.hasBeenDismissed = true;
     }
 
     // Called on video timeupdate
