@@ -4,8 +4,8 @@ import volumeOn from "../assets/images/volume_on.svg"
 import volumeOff from "../assets/images/volume_off.svg"
 import volumeMute from "../assets/images/volume_mute.svg"
 
-// Class responsible for all Ad notifications
-import { NotificationController } from "./notification_controller"
+// Class responsible for all ad timing controls (notifications, skip + play ad buttons)
+import { AdTimingController } from "./notification_controller"
 
 import type { Context, PlayerMode } from "./types"
 import { AD_ADVANCE_WARNING, AD_PLAYS } from "./types"
@@ -106,24 +106,24 @@ class VideoController {
         this.ctx.video.src = this.mode.videoSrc;
     }
 
-    switchToAdMode(notifications: NotificationController) {
+    switchToAdMode(ad_timing_controller: AdTimingController) {
         this.adPlayed = true;
         this.normalModeResumptionTime = this.ctx.video.currentTime;
         this.switchMode(adMode);
         this.ctx.video.currentTime = 0;
         this.playVideo();
         this.showControls();
-        // Sync with NotificationController
-        notifications.switchMode(adMode);
-        notifications.onAdStarted();
+        // Sync with AdTimingController
+        ad_timing_controller.switchMode(adMode);
+        ad_timing_controller.onAdStarted();
     }
 
-    switchToNormalMode(notifications: NotificationController) {
+    switchToNormalMode(ad_timing_controller: AdTimingController) {
         this.switchMode(normalMode);
         this.ctx.video.currentTime = this.normalModeResumptionTime;
         this.playVideo();
-        // Sync with NotificationController
-        notifications.switchMode(normalMode);
+        // Sync with AdTimingController
+        ad_timing_controller.switchMode(normalMode);
     }
 
     private setPlayPauseIcon(src: string) {
@@ -196,7 +196,7 @@ class VideoController {
         if (!(volumeSlider instanceof HTMLInputElement)) return;
 
         // Initialize notification class
-        const notifications = new NotificationController(this.ctx, this.mode);
+        const ad_timing_controller = new AdTimingController(this.ctx, this.mode);
     
         // Initialize volume icon
         this.updateVolumeIcon();
@@ -225,18 +225,18 @@ class VideoController {
 
             // Ad mode switch progress switch
             if (this.mode.shouldAdAppear && !this.adPlayed && progressPercent > AD_PLAYS) {
-                this.switchToAdMode(notifications);
+                this.switchToAdMode(ad_timing_controller);
             }
             
-            // Instead, pass in progress to NotificationController and controller handles all visivility
-            notifications.handleTimeUpdate(progressPercent);
+            // Instead, pass in progress to AdTimingController and controller handles all visivility
+            ad_timing_controller.handleTimeUpdate(progressPercent);
         });
 
         // Handles behavior once a video ends
         video.addEventListener("ended", () => {
             // Autoskip once ad finishes
             if (this.mode.isAutoSkipAdEnabled) {
-                this.switchToNormalMode(notifications);
+                this.switchToNormalMode(ad_timing_controller);
             }
         });
             
@@ -270,13 +270,13 @@ class VideoController {
         });
 
         // Handles Skip Ad button, disappears when in main mode
-        attachClickListener("skip-ad-btn", () => this.switchToNormalMode(notifications));
+        attachClickListener("skip-ad-btn", () => this.switchToNormalMode(ad_timing_controller));
 
         // Handles Ad Play button, should disappear when in ad mode
-        attachClickListener("play-ad-btn", () => this.switchToAdMode(notifications));
+        attachClickListener("play-ad-btn", () => this.switchToAdMode(ad_timing_controller));
 
         // Handles Ad Play notification dismissal
-        attachClickListener("play-ad-dismiss-btn", () => notifications.hidePlayAdBtn());
+        attachClickListener("play-ad-dismiss-btn", () => ad_timing_controller.dismissAdSoonNotification());
 
         // Handles current time display
         video.addEventListener("timeupdate", () => {
