@@ -1,5 +1,5 @@
-// I have the context, but I use nothing from the context...
 import type { Context, PlayerMode } from "./types";
+import { AD_PLAYS } from "./types";
 
 export class AdTimingController {
     private mode: PlayerMode
@@ -93,7 +93,6 @@ export class AdTimingController {
         this.marker.style.left = `${percent}%`;
     }
 
-
     showAdSoonNotification() {
         if (this.hasBeenDismissed) return;
         this.hasBeenShown = true;
@@ -117,7 +116,6 @@ export class AdTimingController {
         if (this.mode.hideSkipAdButton) {
             this.skipAdBtn.hidden = this.mode.hideSkipAdButton(progressPercent);
         }
-
         if (this.hasAdPlayed || this.hasBeenDismissed) return;
 
         // Either mode or Dissmissal determines visibility
@@ -126,6 +124,11 @@ export class AdTimingController {
             this.hideAdSoonNotification();
         } else {
             this.showAdSoonNotification();
+        }
+
+        // Natural ad appearance
+        if (this.mode.shouldAdAppear && progressPercent > AD_PLAYS && this.onAdRequested) {
+            this.onAdRequested();
         }
     }
 }

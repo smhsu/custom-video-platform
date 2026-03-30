@@ -8,7 +8,7 @@ import volumeMute from "../assets/images/volume_mute.svg"
 import { AdTimingController } from "./ad_timing_controller"
 
 import type { Context, PlayerMode } from "./types"
-import { AD_ADVANCE_WARNING, AD_PLAYS } from "./types"
+import { AD_ADVANCE_WARNING } from "./types"
 
 /**
  * MVP features
@@ -224,14 +224,11 @@ class VideoController {
                 progressPercent = (video.currentTime / video.duration) * 100;
             }
             progressBar.style.width = progressPercent + "%";
-
-            // Ad mode switch progress switch
-            if (this.mode.shouldAdAppear && !this.adPlayed && progressPercent > AD_PLAYS) {
-                this.switchToAdMode(ad_timing_controller);
-            }
             
-            // Instead, pass in progress to AdTimingController and controller handles all visivility
             ad_timing_controller.handleTimeUpdate(progressPercent);
+
+            // Handles current time display
+            displayedTime.textContent = this.formatDuration(video.currentTime);
         });
 
         // Handles behavior once a video ends
@@ -269,11 +266,6 @@ class VideoController {
             } else {
                 document.exitFullscreen();
             }
-        });
-
-        // Handles current time display
-        video.addEventListener("timeupdate", () => {
-            displayedTime.textContent = this.formatDuration(video.currentTime);
         });
 
         // Handles display for video's duration.  Automatically runs when the video's src changes.
