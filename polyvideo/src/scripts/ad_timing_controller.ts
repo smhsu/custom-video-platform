@@ -6,69 +6,118 @@ export class AdTimingController {
     private hasBeenDismissed: boolean;
     private hasAdPlayed: boolean;
     private hasBeenShown: boolean;
+    private onSkipAdRequested: (() => void) | null;
+    private onAdRequested: (() => void) | null;
     private marker!: HTMLDivElement;
     private playAdContainer!: HTMLDivElement;
+    private tooltip!: HTMLDivElement;
+    private skipAdBtn!: HTMLButtonElement;
 
     // Removed context as the Controller will document query here
     constructor(ctx: Context, initalMode: PlayerMode) {
         this.initNotificationControls();
-        this.mode = initalMode
+        this.mode = initalMode;
         this.hasBeenDismissed = false;
         this.hasBeenShown = false
         this.hasAdPlayed = false;
+        this.onSkipAdRequested = null;
+        this.onAdRequested = null;
     }
 
-    // Used to connect skip ad button controls
-    setAdRequestedListener(callback: string) {
-        console.log(callback);
+    // Used to connect skip ad button mode switch functionality
+    setSkipAdRequestedListener(callback: () => void) {
+        this.onSkipAdRequested = callback;
+    }
+
+    // Used to connect play ad now button mode switch functionality
+    setPlayAdRequestedListener(callback: () => void) {
+        this.onAdRequested = callback;
     }
 
     // Keep VideoController mode in sync
     switchMode(newMode: PlayerMode) {
-        this.mode = newMode
+        this.mode = newMode;
     }
 
     initNotificationControls() {
         const playAdContainer = document.getElementById("play-ad-container");
         const marker = document.getElementById("marker");
+        const tooltip = document.getElementById("tooltip");
+        const skipAdBtn = document.getElementById("skip-ad-btn");
 
         if (!(playAdContainer instanceof HTMLDivElement)) return;
         if (!(marker instanceof HTMLDivElement)) return;
+        if (!(tooltip instanceof HTMLDivElement)) return;
+        if (!(skipAdBtn instanceof HTMLButtonElement)) return;
 
         this.playAdContainer = playAdContainer;
         this.marker = marker;
+        this.tooltip = tooltip;
+        this.skipAdBtn = skipAdBtn;
+
+        // Utility function for finding an element by ID, ensuring it exists, then attaching a function to run on click.
+        function attachClickListener(elementId: string, onClick: () => void) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            element.addEventListener("click", onClick);
+        }
+
+        // Handles Skip Ad button, disappears when in main mode
+        attachClickListener("skip-ad-btn", () => {
+            if (this.onSkipAdRequested) {
+                this.onSkipAdRequested();
+            }
+        });
+
+        // Handles Ad Play button, should disappear when in ad mode
+        attachClickListener("play-ad-btn", () => {
+            if (this.onAdRequested) {
+                this.onAdRequested();
+            }
+        });
+
+        // Handles Ad Play notification dismissal
+        attachClickListener("play-ad-dismiss-btn", () => this.dismissAdSoonNotification());
+
     }
 
     // Hide controls when ad triggers
     onAdStarted() {
         this.hasAdPlayed = true;
-        this.playAdContainer.hidden = true
-        this.marker.hidden = true
+        this.playAdContainer.hidden = true;
+        this.marker.hidden = true;
     }
 
     // Dynamically set market and Ad placement(currently hardcoded at 50%)
-    setMarkerAtPercent(percent: number){
+    setMarkerAtPercent(percent: number) {
         this.marker.style.left = `${percent}%`;
     }
+
 
     showAdSoonNotification() {
         if (this.hasBeenDismissed) return;
         this.hasBeenShown = true;
         this.playAdContainer.hidden = false;
+        this.tooltip.hidden = false;
     }
 
     hideAdSoonNotification() {
         this.playAdContainer.hidden = true;
     }
 
-    dismissAdSoonNotification(){
+    dismissAdSoonNotification() {
         this.hasBeenDismissed = true;
         this.hideAdSoonNotification();
     }
 
     // Called on video timeupdate
     // Responsible for marker + play-ad-btn visibility based on progress
-    handleTimeUpdate(progressPercent: number){
+    handleTimeUpdate(progressPercent: number) {
+        // Skip button visibility
+        if (this.mode.hideSkipAdButton) {
+            this.skipAdBtn.hidden = this.mode.hideSkipAdButton(progressPercent);
+        }
+
         if (this.hasAdPlayed || this.hasBeenDismissed) return;
 
         // Either mode or Dissmissal determines visibility

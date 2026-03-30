@@ -5,7 +5,7 @@ import volumeOff from "../assets/images/volume_off.svg"
 import volumeMute from "../assets/images/volume_mute.svg"
 
 // Class responsible for all ad timing controls (notifications, skip + play ad buttons)
-import { AdTimingController } from "./notification_controller"
+import { AdTimingController } from "./ad_timing_controller"
 
 import type { Context, PlayerMode } from "./types"
 import { AD_ADVANCE_WARNING, AD_PLAYS } from "./types"
@@ -84,8 +84,6 @@ class VideoController {
     private normalModeResumptionTime: number = 0;
     // Flag to track if viewer has watched an ad (only checks one ad)
     private adPlayed: boolean;
-    // Flag to track if play ad button has been dismissed (will be eventually be in a new "PlayAdControl" class)
-    private playAdBtnDissmissed: boolean
     private autoHideTimeout: ReturnType<typeof setTimeout> | null = null;
 
 
@@ -95,7 +93,6 @@ class VideoController {
         this.switchMode(initialMode);
         this.initPlayerControls();
         this.adPlayed = false;
-        this.playAdBtnDissmissed = false;
     }
 
     // Clear timeout on mode switches
@@ -197,7 +194,17 @@ class VideoController {
 
         // Initialize notification class
         const ad_timing_controller = new AdTimingController(this.ctx, this.mode);
-    
+
+        // Callback functions triggered by ad_timing_controller
+        ad_timing_controller.setSkipAdRequestedListener(() => {
+            this.switchToNormalMode(ad_timing_controller);
+        });
+
+        ad_timing_controller.setPlayAdRequestedListener(() => {
+            this.switchToAdMode(ad_timing_controller);
+        });
+
+
         // Initialize volume icon
         this.updateVolumeIcon();
 
@@ -217,11 +224,6 @@ class VideoController {
                 progressPercent = (video.currentTime / video.duration) * 100;
             }
             progressBar.style.width = progressPercent + "%";
-
-            // Skip button visibility
-            if (this.mode.hideSkipAdButton) {
-                skipAdBtn.hidden = this.mode.hideSkipAdButton(progressPercent);
-            }
 
             // Ad mode switch progress switch
             if (this.mode.shouldAdAppear && !this.adPlayed && progressPercent > AD_PLAYS) {
@@ -268,15 +270,6 @@ class VideoController {
                 document.exitFullscreen();
             }
         });
-
-        // Handles Skip Ad button, disappears when in main mode
-        attachClickListener("skip-ad-btn", () => this.switchToNormalMode(ad_timing_controller));
-
-        // Handles Ad Play button, should disappear when in ad mode
-        attachClickListener("play-ad-btn", () => this.switchToAdMode(ad_timing_controller));
-
-        // Handles Ad Play notification dismissal
-        attachClickListener("play-ad-dismiss-btn", () => ad_timing_controller.dismissAdSoonNotification());
 
         // Handles current time display
         video.addEventListener("timeupdate", () => {
