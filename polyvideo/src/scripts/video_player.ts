@@ -12,15 +12,12 @@ import { AD_ADVANCE_WARNING } from "./types"
 
 /**
  * MVP features
- * Render a video player that doesn't have all of the ad soon play now features based on url parameters
- *       Introduce a third mode
- *          ex: should ad soon notifcation appear on one mode 
- * Implement notifiation controller refactor (should skip-ad-btn functionality be added?) -/
- * Bug: Autohide doesn't retrigger when switching back to normal mode
- * Seperate Modes to their own file
- * There is a telemetry system in place (requires backend)
- *      Set up database...
- *      Set up backend API...
+ * TODOs silas
+ *    test on Safari, mac firefox
+ *    Telemetry
+ * TODOs elijah
+ *    mode where the ad just plays, no user control when -- use URL params
+ *    Bug: Autohide doesn't retrigger when switching back to normal mode
  */
 
 /**
@@ -30,7 +27,6 @@ import { AD_ADVANCE_WARNING } from "./types"
  * Video scrubber mouse clicks are not completely precise
  * Change profile icons
  */
-
 // Mode for main content
 const normalMode: PlayerMode = {
     videoSrc: "", // Will be auto-set from the video element
