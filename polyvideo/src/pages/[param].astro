@@ -1,0 +1,15 @@
+---
+import Main from "../components/Main.astro";
+// Astro requires predetermined paths to build
+export async function getStaticPaths() {
+  return [
+    { params: { param: 'ad' } }, 
+    { params: { param: 'normal' } }
+  ];
+}
+
+// Path Parameter to determine modes: earlyad, normalad
+const { param } = Astro.params;
+---
+
+<Main serviceParams={param} />

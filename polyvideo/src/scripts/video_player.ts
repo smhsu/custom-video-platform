@@ -339,7 +339,13 @@ function init() {
         customControlContainer
     };
 
+    // Check current mode from url params
+    const mainContainer = document.getElementById("main-container")
+    if(!(mainContainer instanceof HTMLDivElement)) return;
+    const serviceParams = mainContainer.dataset.serviceParams;
+
     normalMode.videoSrc = video.currentSrc;
+    
     // Create VideoController instance
     const controller = new VideoController(ctx, normalMode);
 }
