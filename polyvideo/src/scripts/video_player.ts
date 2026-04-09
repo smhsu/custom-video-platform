@@ -339,8 +339,8 @@ function init() {
         customControlContainer
     };
 
-    // Check current mode from url params
-    const mainContainer = document.getElementById("main-container")
+    // Check current mode from url params (stored as data- attribute on main container)
+    const mainContainer = document.getElementById("main-container");
     if(!(mainContainer instanceof HTMLDivElement)) return;
     const serviceParams = mainContainer.dataset.serviceParams;
 
