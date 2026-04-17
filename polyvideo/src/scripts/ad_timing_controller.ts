@@ -65,6 +65,8 @@ export class AdTimingController {
         const serviceParams = window.location.pathname;
         if (serviceParams) this.service = serviceParams;
 
+        this.setMarkerAtPercent(AD_PLAYS);
+
         // Utility function for finding an element by ID, ensuring it exists, then attaching a function to run on click.
         function attachClickListener(elementId: string, onClick: () => void) {
             const element = document.getElementById(elementId);
@@ -100,7 +102,11 @@ export class AdTimingController {
 
     // Dynamically set marker and Ad placement(currently hardcoded at 50%)
     setMarkerAtPercent(percent: number) {
-        this.marker.style.left = `${percent}%`;
+        if (this.hasPlayAdService()) {
+            this.marker.style.left = `${percent}%`;
+        } else {
+            this.marker.hidden = true
+        }
     }
 
     showAdSoonNotification() {
