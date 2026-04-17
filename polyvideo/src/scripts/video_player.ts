@@ -16,8 +16,8 @@ import { AD_ADVANCE_WARNING } from "./types"
  *    test on Safari, mac firefox
  *    Telemetry
  * TODOs elijah
- *    mode where the ad just plays, no user control when -- use URL params
- *    Bug: Autohide doesn't retrigger when switching back to normal mode
+ *    mode where the ad just plays, no user control when -- use URL params -/
+ *    Bug: Autohide doesn't retrigger when switching back to normal mode -/
  */
 
 /**
@@ -112,6 +112,8 @@ class VideoController {
         this.playVideo();
         // Sync with AdTimingController
         ad_timing_controller.switchMode(normalMode);
+        // Retrigger autohide (needed for when cursor not in video-container on mode switch)
+        this.restartAutohideControls();
     }
 
     private setPlayPauseIcon(src: string) {
@@ -134,6 +136,18 @@ class VideoController {
         if (!(iconImgElement instanceof HTMLImageElement)) return;
 
         iconImgElement.src = nextSrc;
+    }
+
+    // Reset timer for hiding
+    private restartAutohideControls() {
+        this.clearAutoHideTimeout();
+
+        this.showControls()
+
+        this.autoHideTimeout = setTimeout(() => {
+            if (!this.mode.isAutoHideControlsEnabled) return;
+            this.hideControls();
+        }, 2500) // In ms, so 2.5 seconds then executes 
     }
 
     playVideo() {
@@ -282,15 +296,7 @@ class VideoController {
 
         // Handles auto hiding video controls
         videoContainer.addEventListener("mousemove", () => {
-            // Reset timer for hiding
-            this.clearAutoHideTimeout();
-
-            this.showControls()
-
-            this.autoHideTimeout = setTimeout(() => {
-                if (!this.mode.isAutoHideControlsEnabled) return;
-                this.hideControls();
-            }, 2500) // In ms, so 2.5 seconds then executes 
+            this.restartAutohideControls();
         });
 
         videoContainer.addEventListener("mouseleave", () => {

@@ -100,7 +100,7 @@ export class AdTimingController {
         this.marker.hidden = true;
     }
 
-    // Dynamically set marker and Ad placement(currently hardcoded at 50%)
+    // Dynamically set marker and Ad placement
     setMarkerAtPercent(percent: number) {
         if (this.hasPlayAdService()) {
             this.marker.style.left = `${percent}%`;
