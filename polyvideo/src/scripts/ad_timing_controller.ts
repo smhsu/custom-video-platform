@@ -1,5 +1,5 @@
-import type { Context, PlayerMode } from "./types";
-import { AD_PLAYS } from "./types";
+import { type Context, type PlayerMode} from "./types";
+import { AD_PLAYS, adEarlyPath } from "./types";
 
 export class AdTimingController {
     private mode: PlayerMode
@@ -12,10 +12,10 @@ export class AdTimingController {
     private playAdContainer!: HTMLDivElement;
     private tooltip!: HTMLDivElement;
     private skipAdBtn!: HTMLButtonElement;
-    private service: string
+    private service!: string;
 
     // Removed context as the Controller will document query here
-    constructor(ctx: Context, initalMode: PlayerMode, service: string) {
+    constructor(ctx: Context, initalMode: PlayerMode) {
         this.initNotificationControls();
         this.mode = initalMode;
         this.hasBeenDismissed = false;
@@ -23,7 +23,6 @@ export class AdTimingController {
         this.hasAdPlayed = false;
         this.onSkipAdRequested = null;
         this.onAdRequested = null;
-        this.service = service;
     }
 
     // Used to connect skip ad button mode switch functionality
@@ -42,8 +41,8 @@ export class AdTimingController {
     }
 
     // Checks if the current service supports the custom ad playing controls
-    private checkPlayAdService() {
-        return this.service !== "ad";
+    private hasPlayAdService() {
+        return this.service === adEarlyPath;
     }
 
     initNotificationControls() {
@@ -61,6 +60,10 @@ export class AdTimingController {
         this.marker = marker;
         this.tooltip = tooltip;
         this.skipAdBtn = skipAdBtn;
+
+        // Check current service from URL params
+        const serviceParams = window.location.pathname;
+        if (serviceParams) this.service = serviceParams;
 
         // Utility function for finding an element by ID, ensuring it exists, then attaching a function to run on click.
         function attachClickListener(elementId: string, onClick: () => void) {
@@ -95,14 +98,14 @@ export class AdTimingController {
         this.marker.hidden = true;
     }
 
-    // Dynamically set market and Ad placement(currently hardcoded at 50%)
+    // Dynamically set marker and Ad placement(currently hardcoded at 50%)
     setMarkerAtPercent(percent: number) {
         this.marker.style.left = `${percent}%`;
     }
 
     showAdSoonNotification() {
         if (this.hasBeenDismissed) return;
-        if (this.checkPlayAdService()) return;
+        if (!this.hasPlayAdService()) return;
         this.hasBeenShown = true;
         this.playAdContainer.hidden = false;
         this.tooltip.hidden = false;
@@ -124,6 +127,7 @@ export class AdTimingController {
         if (this.mode.hideSkipAdButton) {
             this.skipAdBtn.hidden = this.mode.hideSkipAdButton(progressPercent);
         }
+
         if (this.hasAdPlayed || this.hasBeenDismissed) return;
 
         // Either mode or Dissmissal determines visibility

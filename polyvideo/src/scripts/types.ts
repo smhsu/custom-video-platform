@@ -34,3 +34,7 @@ export interface PlayerMode {
 
     hidePlayAdButton(progressPercent: number): boolean;
 }
+
+// Supported URL param paths in [param].astro)
+export const adEarlyPath = "/adearly"
+export const normalAdPath = "/normal"

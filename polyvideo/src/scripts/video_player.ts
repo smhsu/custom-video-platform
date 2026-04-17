@@ -79,14 +79,12 @@ class VideoController {
     private mode: PlayerMode;
     private normalModeResumptionTime: number = 0;
     private autoHideTimeout: ReturnType<typeof setTimeout> | null = null;
-    private service: string;
 
-    constructor(ctx: Context, initialMode: PlayerMode, service: string) {
+    constructor(ctx: Context, initialMode: PlayerMode) {
         this.ctx = ctx;
         this.mode = initialMode;
         this.switchMode(initialMode);
         this.initPlayerControls();
-        this.service = service
     }
 
     // Clear timeout on mode switches
@@ -186,7 +184,7 @@ class VideoController {
         if (!(volumeSlider instanceof HTMLInputElement)) return;
 
         // Initialize notification class
-        const ad_timing_controller = new AdTimingController(this.ctx, this.mode, this.service);
+        const ad_timing_controller = new AdTimingController(this.ctx, this.mode);
 
         // Callback functions triggered by ad_timing_controller
         ad_timing_controller.setSkipAdRequestedListener(() => {
@@ -335,16 +333,10 @@ function init() {
         customControlContainer
     };
 
-    // Check current service from url params (either /normal or /adearly)
-    const serviceParams = window.location.pathname;
-    console.log(serviceParams);
-
     normalMode.videoSrc = video.currentSrc;
     
     // Create VideoController instance
-    if (serviceParams) {
-        const controller = new VideoController(ctx, normalMode, serviceParams)
-    };
+    const controller = new VideoController(ctx, normalMode)
 }
 
 init();
