@@ -42,12 +42,10 @@ const data = {
     ],
   },
 };
-
-const {serviceParams} = Astro.props;
 ---
 
 <Layout comments={data.option1.comments}>
   <Navbar slot="header" />
-  <VideoSection slot="video" videoData={data.option1} serviceParams={serviceParams} />
+  <VideoSection slot="video" videoData={data.option1} />
   <CommentSection slot="comments" commentData={data.option1.comments}/>
 </Layout>

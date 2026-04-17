@@ -78,17 +78,15 @@ class VideoController {
     private ctx: Context;
     private mode: PlayerMode;
     private normalModeResumptionTime: number = 0;
-    // Flag to track if viewer has watched an ad (only checks one ad)
-    private adPlayed: boolean;
     private autoHideTimeout: ReturnType<typeof setTimeout> | null = null;
+    private service: string;
 
-
-    constructor(ctx: Context, initialMode: PlayerMode) {
+    constructor(ctx: Context, initialMode: PlayerMode, service: string) {
         this.ctx = ctx;
         this.mode = initialMode;
         this.switchMode(initialMode);
         this.initPlayerControls();
-        this.adPlayed = false;
+        this.service = service
     }
 
     // Clear timeout on mode switches
@@ -100,7 +98,6 @@ class VideoController {
     }
 
     switchToAdMode(ad_timing_controller: AdTimingController) {
-        this.adPlayed = true;
         this.normalModeResumptionTime = this.ctx.video.currentTime;
         this.switchMode(adMode);
         this.ctx.video.currentTime = 0;
@@ -189,7 +186,7 @@ class VideoController {
         if (!(volumeSlider instanceof HTMLInputElement)) return;
 
         // Initialize notification class
-        const ad_timing_controller = new AdTimingController(this.ctx, this.mode);
+        const ad_timing_controller = new AdTimingController(this.ctx, this.mode, this.service);
 
         // Callback functions triggered by ad_timing_controller
         ad_timing_controller.setSkipAdRequestedListener(() => {
@@ -199,7 +196,6 @@ class VideoController {
         ad_timing_controller.setPlayAdRequestedListener(() => {
             this.switchToAdMode(ad_timing_controller);
         });
-
 
         // Initialize volume icon
         this.updateVolumeIcon();
@@ -339,15 +335,16 @@ function init() {
         customControlContainer
     };
 
-    // Check current mode from url params (stored as data- attribute on main container)
-    const mainContainer = document.getElementById("main-container");
-    if(!(mainContainer instanceof HTMLDivElement)) return;
-    const serviceParams = mainContainer.dataset.serviceParams;
+    // Check current service from url params (either /normal or /adearly)
+    const serviceParams = window.location.pathname;
+    console.log(serviceParams);
 
     normalMode.videoSrc = video.currentSrc;
     
     // Create VideoController instance
-    const controller = new VideoController(ctx, normalMode);
+    if (serviceParams) {
+        const controller = new VideoController(ctx, normalMode, serviceParams)
+    };
 }
 
 init();

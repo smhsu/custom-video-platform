@@ -12,9 +12,10 @@ export class AdTimingController {
     private playAdContainer!: HTMLDivElement;
     private tooltip!: HTMLDivElement;
     private skipAdBtn!: HTMLButtonElement;
+    private service: string
 
     // Removed context as the Controller will document query here
-    constructor(ctx: Context, initalMode: PlayerMode) {
+    constructor(ctx: Context, initalMode: PlayerMode, service: string) {
         this.initNotificationControls();
         this.mode = initalMode;
         this.hasBeenDismissed = false;
@@ -22,6 +23,7 @@ export class AdTimingController {
         this.hasAdPlayed = false;
         this.onSkipAdRequested = null;
         this.onAdRequested = null;
+        this.service = service;
     }
 
     // Used to connect skip ad button mode switch functionality
@@ -37,6 +39,11 @@ export class AdTimingController {
     // Keep VideoController mode in sync
     switchMode(newMode: PlayerMode) {
         this.mode = newMode;
+    }
+
+    // Checks if the current service supports the custom ad playing controls
+    private checkPlayAdService() {
+        return this.service !== "ad";
     }
 
     initNotificationControls() {
@@ -95,6 +102,7 @@ export class AdTimingController {
 
     showAdSoonNotification() {
         if (this.hasBeenDismissed) return;
+        if (this.checkPlayAdService()) return;
         this.hasBeenShown = true;
         this.playAdContainer.hidden = false;
         this.tooltip.hidden = false;

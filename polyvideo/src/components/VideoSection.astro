@@ -1,11 +1,11 @@
 ---
 import VideoPlayer from "./VideoPlayer.astro";
 import { Image } from "astro:assets";
-const { videoData, serviceParams } = Astro.props;
+const { videoData } = Astro.props;
 ---
 
 <div class="max-w-5xl m-1">
-  <VideoPlayer videoSource={videoData.videoPath} serviceParams={serviceParams} />
+  <VideoPlayer videoSource={videoData.videoPath} />
   <h1 class="mt-5 text-3xl font-bold">{videoData.title}</h1>
   <div class="flex flex-row justify-between w-auto mt-6 mb-6">
     <div class="flex flex-row gap-1">

@@ -3,7 +3,7 @@ import { Image } from "astro:assets";
 import playIcon from "../assets/images/play.svg";
 import fullscreenIcon from "../assets/images/fullscreen.svg";
 import volumeOn from "../assets/images/volume_on.svg";
-const { videoSource, serviceParams } = Astro.props;
+const { videoSource } = Astro.props;
 
 /*
 TODOs
@@ -15,7 +15,7 @@ Add "Ad soon, play now?" notification somewhere on the screen. It should appear 
 */
 ---
 
-<div id="main-container" class="relative" data-service-params={serviceParams}>
+<div  class="relative">
   <div id="video-container" class="relative w-full aspect-video bg-black overflow-hidden">
     <video id="media-video" class="absolute inset-0 w-full h-full">
       <source src={videoSource} type="video/mp4" />
