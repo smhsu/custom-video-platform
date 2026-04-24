@@ -5,14 +5,6 @@ import fullscreenIcon from "../assets/images/fullscreen.svg";
 import volumeOn from "../assets/images/volume_on.svg";
 const { videoSource } = Astro.props;
 
-/*
-TODOs
-
-Make sure play ad and skip are not continuously visible
-Volume slider doesn't work
-Schedule an ad in the middle
-Add "Ad soon, play now?" notification somewhere on the screen. It should appear 90s before the ad is scheduled.
-*/
 ---
 
 <div  class="relative">
@@ -68,6 +60,7 @@ Add "Ad soon, play now?" notification somewhere on the screen. It should appear 
           min="0"
           max="100"
           value="0"
+          step="0.1"
           class="timeline-bar absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
       </div>

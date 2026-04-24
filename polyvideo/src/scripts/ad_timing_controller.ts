@@ -93,7 +93,7 @@ export class AdTimingController {
 
     }
 
-    // Hide controls when ad triggers
+    // Hide controls when ad triggers, called on VideoController
     onAdStarted() {
         this.hasAdPlayed = true;
         this.playAdContainer.hidden = true;
@@ -134,7 +134,7 @@ export class AdTimingController {
             this.skipAdBtn.hidden = this.mode.hideSkipAdButton(progressPercent);
         }
 
-        if (this.hasAdPlayed || this.hasBeenDismissed) return;
+        if (this.hasAdPlayed) return;
 
         // Either mode or Dissmissal determines visibility
         // hasBeenShown flag once play-ad-btn is shown (shouldn't rehide if user rewinds)

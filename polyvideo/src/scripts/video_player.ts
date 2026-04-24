@@ -16,6 +16,7 @@ import { AD_ADVANCE_WARNING } from "./types"
  *    test on Safari, mac firefox
  *    Telemetry
  * TODOs elijah
+ *    Play ad early dissmissal bug
  *    Other nice to haves (below)
  */
 
@@ -247,7 +248,7 @@ class VideoController {
         scrubber.addEventListener("input", () => {
             if (!this.mode.canSeek) return;
 
-            const percentIntoVideo = parseInt(scrubber.value);
+            const percentIntoVideo = parseFloat(scrubber.value);
             // Covert the percentage into the video into the number of seconds into the video
             video.currentTime = (percentIntoVideo / 100) * video.duration;
             progressBar.style.width = percentIntoVideo + "%";
