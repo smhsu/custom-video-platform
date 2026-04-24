@@ -16,7 +16,7 @@ import { AD_ADVANCE_WARNING } from "./types"
  *    test on Safari, mac firefox
  *    Telemetry
  * TODOs elijah
- *    Play ad early dissmissal bug
+ *    Play ad early dissmissal bug -/
  *    Other nice to haves (below)
  */
 
@@ -24,7 +24,7 @@ import { AD_ADVANCE_WARNING } from "./types"
  * Other nice to haves
  *
  * Polish styles cross-platform
- * Video scrubber mouse clicks are not completely precise
+ * Video scrubber mouse clicks are not completely precise -/
  * Change profile icons -/
  * Reset video state on end (play icon and show controls)
  */
@@ -183,6 +183,21 @@ class VideoController {
         }
     }
 
+    // Seeks video to desired time
+    seekVideo(clientX: number) {
+        if (!this.mode.canSeek) return;
+        const rect = this.ctx.scrubber.getBoundingClientRect();
+        const offsetX = clientX - rect.left;
+        const clampedX = Math.max(0, Math.min(offsetX, rect.width));
+        const percentIntoVideo = (clampedX / rect.width) * 100;
+
+        // Sync scrubber value progress bar
+        this.ctx.scrubber.value = String(percentIntoVideo);
+        // Covert the percentage into the video into the number of seconds into the video
+        this.ctx.video.currentTime = (percentIntoVideo / 100) * this.ctx.video.duration;
+        this.ctx.progressBar.style.width = percentIntoVideo + "%";
+    }
+
     initPlayerControls() {
         // Grab all needed HTML elements from context
         const { video, progressBar, scrubber, customControlContainer } = this.ctx;
@@ -245,13 +260,24 @@ class VideoController {
         });
             
         // Handles timeline clicks, i.e. user requests to seek.
-        scrubber.addEventListener("input", () => {
-            if (!this.mode.canSeek) return;
+        scrubber.addEventListener("pointerdown", (e) => {
+            this.seekVideo(e.clientX);
+        });
 
-            const percentIntoVideo = parseFloat(scrubber.value);
-            // Covert the percentage into the video into the number of seconds into the video
-            video.currentTime = (percentIntoVideo / 100) * video.duration;
-            progressBar.style.width = percentIntoVideo + "%";
+        // Handles timeline dragging
+        let isScrubbing = false;
+        scrubber.addEventListener("pointerdown", (e) => {
+            isScrubbing = true;
+            this.seekVideo(e.clientX)
+        });
+
+        window.addEventListener("pointermove", (e) => {
+            if (!isScrubbing) return;
+            this.seekVideo(e.clientX);
+        });
+
+        scrubber.addEventListener("pointerup", () => {
+            isScrubbing = false;
         });
 
         // Toggle play button
