@@ -16,8 +16,7 @@ import { AD_ADVANCE_WARNING } from "./types"
  *    test on Safari, mac firefox
  *    Telemetry
  * TODOs elijah
- *    mode where the ad just plays, no user control when -- use URL params -/
- *    Bug: Autohide doesn't retrigger when switching back to normal mode -/
+ *    Other nice to haves (below)
  */
 
 /**
@@ -25,7 +24,8 @@ import { AD_ADVANCE_WARNING } from "./types"
  *
  * Polish styles cross-platform
  * Video scrubber mouse clicks are not completely precise
- * Change profile icons
+ * Change profile icons -/
+ * Reset video state on end (play icon and show controls)
  */
 // Mode for main content
 const normalMode: PlayerMode = {
