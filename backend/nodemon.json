@@ -1,6 +1,6 @@
 {
   "watch": ["src"],
-  "ignore": ["src/**/*.test.ts", "node_modules"],
-  "ext": "ts,mjs,js,json,graphql",
+  "ignore": ["src/**/*.test.ts", "node_modules", "dist"],
+  "ext": "ts,json",
   "exec": "npx tsc && node ./dist/index.js"
 }

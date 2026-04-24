@@ -9,17 +9,15 @@
   },
   "author": "",
   "license": "ISC",
-  "description": "You may use this template for both your labs and your project in CSC 437.  Let's take a tour so you can more easily customize the server to your needs.",
+  "description": "",
   "dependencies": {
     "dotenv": "^16.4.7",
-    "express": "^4.22.1"
+    "express": "^4.21.2"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.5",
     "nodemon": "^3.1.9",
     "typescript": "^5.7.3"
-  },
-  "keywords": [],
-  "type": "module"
+  }
 }
